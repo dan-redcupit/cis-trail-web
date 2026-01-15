@@ -8,55 +8,41 @@ interface ResultScreenProps {
 }
 
 export default function ResultScreen({ correct, explanation, correctAnswer, onContinue }: ResultScreenProps) {
-  if (correct) {
-    return (
-      <div className="text-center cursor-pointer" onClick={onContinue}>
-        <pre className="text-terminal-green glow text-sm sm:text-base leading-tight">
-{`
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                                                                              ║
-║                           ╔═══════════════════╗                              ║
-║                           ║                   ║                              ║
-║                           ║   ✓  CORRECT!  ✓  ║                              ║
-║                           ║                   ║                              ║
-║                           ╚═══════════════════╝                              ║
-║                                                                              ║
-║               The auditor nods approvingly at your response.                 ║
-║                    Your team may continue on the trail.                      ║
-║                                                                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-`}
-        </pre>
-        <p className="mt-4 text-terminal-cyan max-w-2xl mx-auto">
-          Explanation: {explanation}
-        </p>
-        <p className="mt-4 text-terminal-green blink">[ CLICK TO CONTINUE ]</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="text-center cursor-pointer" onClick={onContinue}>
-      <pre className="text-terminal-red glow-red text-sm sm:text-base leading-tight">
-{`
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                                                                              ║
-║                           ╔═══════════════════╗                              ║
-║                           ║                   ║                              ║
-║                           ║   ✗  INCORRECT ✗  ║                              ║
-║                           ║                   ║                              ║
-║                           ╚═══════════════════╝                              ║
-║                                                                              ║
-║              The auditor frowns and makes a note in their tablet.            ║
-║                      The correct answer was: ${correctAnswer}                            ║
-║                                                                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-`}
-      </pre>
-      <p className="mt-4 text-terminal-cyan max-w-2xl mx-auto">
-        Explanation: {explanation}
+    <div className="text-center cursor-pointer max-w-2xl mx-auto" onClick={onContinue}>
+      <div className={`border-2 p-4 sm:p-6 ${correct ? 'border-terminal-green' : 'border-terminal-red'}`}>
+        {correct ? (
+          <>
+            <div className="text-terminal-green text-3xl sm:text-4xl font-bold mb-4">
+              ✓ CORRECT! ✓
+            </div>
+            <p className="text-terminal-green text-base sm:text-lg mb-4">
+              The auditor nods approvingly at your response.
+              Your team may continue on the trail.
+            </p>
+          </>
+        ) : (
+          <>
+            <div className="text-terminal-red text-3xl sm:text-4xl font-bold mb-4">
+              ✗ INCORRECT ✗
+            </div>
+            <p className="text-terminal-red text-base sm:text-lg mb-4">
+              The auditor frowns and makes a note in their tablet.
+              The correct answer was: <span className="font-bold">{correctAnswer}</span>
+            </p>
+          </>
+        )}
+
+        <div className="border-t border-terminal-cyan pt-4 mt-4">
+          <p className="text-terminal-cyan text-sm sm:text-base">
+            <span className="font-bold">Explanation:</span> {explanation}
+          </p>
+        </div>
+      </div>
+
+      <p className={`mt-6 text-lg blink ${correct ? 'text-terminal-green' : 'text-terminal-red'}`}>
+        [ CLICK TO CONTINUE ]
       </p>
-      <p className="mt-4 text-terminal-red blink">[ CLICK TO CONTINUE ]</p>
     </div>
   );
 }

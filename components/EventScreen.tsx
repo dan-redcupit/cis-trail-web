@@ -8,42 +8,36 @@ interface EventScreenProps {
 }
 
 export default function EventScreen({ event, onContinue }: EventScreenProps) {
-  const borderColor = event.type === 'death' ? 'text-terminal-red' :
-                      event.type === 'good' ? 'text-terminal-green' :
-                      event.type === 'bad' ? 'text-terminal-yellow' :
-                      'text-terminal-cyan';
+  const borderColor = event.type === 'death' ? 'border-terminal-red' :
+                      event.type === 'good' ? 'border-terminal-green' :
+                      event.type === 'bad' ? 'border-terminal-yellow' :
+                      'border-terminal-cyan';
 
-  const glowClass = event.type === 'death' ? 'glow-red' :
-                    event.type === 'good' ? 'glow' :
-                    'glow-yellow';
+  const textColor = event.type === 'death' ? 'text-terminal-red' :
+                    event.type === 'good' ? 'text-terminal-green' :
+                    event.type === 'bad' ? 'text-terminal-yellow' :
+                    'text-terminal-cyan';
+
+  const emoji = event.type === 'death' ? '💀' :
+                event.type === 'good' ? '🌟' :
+                event.type === 'bad' ? '⚠️' :
+                '📢';
 
   return (
-    <div className="text-center cursor-pointer" onClick={onContinue}>
-      <pre className={`${borderColor} ${glowClass} text-sm sm:text-base leading-tight`}>
-{`
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                                                                              ║
-║                            TRAIL EVENT                                       ║
-║                                                                              ║
-╠══════════════════════════════════════════════════════════════════════════════╣
-║                                                                              ║`}
-      </pre>
-
-      <div className={`${borderColor} text-sm sm:text-base font-mono px-4`}>
-        <div className="flex justify-center">
-          <span>║</span>
-          <span className="text-white flex-1 text-center px-4 py-2">{event.text}</span>
-          <span>║</span>
+    <div className="text-center cursor-pointer max-w-2xl mx-auto" onClick={onContinue}>
+      <div className={`border-2 ${borderColor} p-4 sm:p-6`}>
+        <div className={`${textColor} text-xl sm:text-2xl font-bold mb-4`}>
+          {emoji} TRAIL EVENT {emoji}
         </div>
+
+        <p className="text-white text-base sm:text-lg">
+          {event.text}
+        </p>
       </div>
 
-      <pre className={`${borderColor} ${glowClass} text-sm sm:text-base leading-tight`}>
-{`║                                                                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-`}
-      </pre>
-
-      <p className={`mt-4 ${borderColor} blink`}>[ CLICK TO CONTINUE ]</p>
+      <p className={`mt-6 text-lg blink ${textColor}`}>
+        [ CLICK TO CONTINUE ]
+      </p>
     </div>
   );
 }

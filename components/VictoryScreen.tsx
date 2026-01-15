@@ -15,68 +15,58 @@ export default function VictoryScreen({ state, onRestart }: VictoryScreenProps) 
     : 0;
 
   return (
-    <div className="text-center">
-      <pre className="text-terminal-green glow text-xs sm:text-sm leading-tight">
-{`
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                                                                              ║
-║    ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★     ║
-║                                                                              ║
-║                                                                              ║
-║           ██████╗███████╗██████╗ ████████╗██╗███████╗██╗███████╗██████╗      ║
-║          ██╔════╝██╔════╝██╔══██╗╚══██╔══╝██║██╔════╝██║██╔════╝██╔══██╗     ║
-║          ██║     █████╗  ██████╔╝   ██║   ██║█████╗  ██║█████╗  ██║  ██║     ║
-║          ██║     ██╔══╝  ██╔══██╗   ██║   ██║██╔══╝  ██║██╔══╝  ██║  ██║     ║
-║          ╚██████╗███████╗██║  ██║   ██║   ██║██║     ██║███████╗██████╔╝     ║
-║           ╚═════╝╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝╚═╝     ╚═╝╚══════╝╚═════╝      ║
-║                                                                              ║
-║                      CMMC LEVEL 2 - ACHIEVED!                                ║
-║                                                                              ║
-║    ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★     ║
-║                                                                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-`}
-      </pre>
+    <div className="text-center max-w-2xl mx-auto">
+      <div className="border-2 border-terminal-green p-4 sm:p-6">
+        <div className="text-terminal-green text-xl sm:text-3xl font-bold mb-2">
+          ★ ★ ★ CERTIFIED ★ ★ ★
+        </div>
+        <div className="text-terminal-green text-lg sm:text-xl mb-4">
+          CMMC LEVEL 2 - ACHIEVED!
+        </div>
 
-      <pre className="text-terminal-green text-xs sm:text-sm leading-tight mt-4">
-{`╔══════════════════════════════════════════════════════════════════════════════╗
-║                              FINAL REPORT                                    ║
-╠══════════════════════════════════════════════════════════════════════════════╣
-║                                                                              ║
-║  Survivors: ${survivors.length}/${state.party.length}                                                            ║
-║  Questions Answered: ${state.questionsAnswered}                                                      ║
-║  Accuracy: ${accuracy}%                                                               ║
-║  Final Morale: ${state.morale}%                                                          ║
-║  Final SPRS Score: ${state.sprsScore}                                                       ║
-║                                                                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝`}
-      </pre>
+        <div className="border-t border-terminal-green pt-4 space-y-2 text-sm sm:text-base">
+          <div className="flex justify-between">
+            <span>Survivors:</span>
+            <span>{survivors.length}/{state.party.length}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Questions Answered:</span>
+            <span>{state.questionsAnswered}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Accuracy:</span>
+            <span>{accuracy}%</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Final Morale:</span>
+            <span>{state.morale}%</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Final SPRS Score:</span>
+            <span>{state.sprsScore}</span>
+          </div>
+        </div>
 
-      <div className="mt-4 text-left max-w-md mx-auto">
-        <p className="text-terminal-green font-bold">SURVIVORS:</p>
-        {survivors.map((member, i) => (
-          <p key={i} className="text-terminal-green ml-4">🏆 {member.name}</p>
-        ))}
+        <div className="border-t border-terminal-green pt-4 mt-4 text-left text-sm sm:text-base">
+          <div className="text-terminal-green font-bold">SURVIVORS:</div>
+          {survivors.map((m, i) => (
+            <div key={i} className="text-terminal-green ml-2">🏆 {m.name}</div>
+          ))}
 
-        {fallen.length > 0 && (
-          <>
-            <p className="text-terminal-red font-bold mt-4">FALLEN HEROES:</p>
-            {fallen.map((member, i) => (
-              <p key={i} className="text-terminal-red ml-4">⚰️ {member.name}</p>
-            ))}
-          </>
-        )}
+          {fallen.length > 0 && (
+            <>
+              <div className="text-terminal-red font-bold mt-2">FALLEN:</div>
+              {fallen.map((m, i) => (
+                <div key={i} className="text-terminal-red ml-2">⚰️ {m.name}</div>
+              ))}
+            </>
+          )}
+        </div>
+
+        <p className="text-terminal-yellow text-sm mt-4 italic">
+          (...until next year's reassessment)
+        </p>
       </div>
-
-      <pre className="text-terminal-green text-xs sm:text-sm leading-tight mt-4">
-{`╔══════════════════════════════════════════════════════════════════════════════╗
-║                                                                              ║
-║       Congratulations! Your organization is now CMMC Level 2 Certified!      ║
-║                                                                              ║
-║                   (...until next year's reassessment)                        ║
-║                                                                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝`}
-      </pre>
 
       <button className="terminal-btn mt-6" onClick={onRestart}>
         Play Again

@@ -9,68 +9,36 @@ interface QuestionScreenProps {
 
 export default function QuestionScreen({ question, onAnswer }: QuestionScreenProps) {
   return (
-    <div className="text-center">
-      <pre className="text-terminal-green glow text-sm sm:text-base leading-tight">
-{`
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                                                                              ║
-║    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░    ║
-║    ░░                                                                  ░░    ║
-║    ░░                   COMPLIANCE CHECKPOINT                          ░░    ║
-║    ░░                                                                  ░░    ║
-║    ░░                         ╔═══════╗                                ░░    ║
-║    ░░                         ║ STOP  ║                                ░░    ║
-║    ░░                         ║ C3PAO ║                                ░░    ║
-║    ░░                         ╚═══════╝                                ░░    ║
-║    ░░                            ║║                                    ░░    ║
-║    ░░                            ║║                                    ░░    ║
-║    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░    ║
-║                                                                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-`}
-      </pre>
-
-      <pre className="text-terminal-green text-sm sm:text-base leading-tight mt-4">
-{`╔══════════════════════════════════════════════════════════════════════════════╗
-║                          AUDITOR'S QUESTION                                  ║
-╠══════════════════════════════════════════════════════════════════════════════╣
-║                                                                              ║`}
-      </pre>
-
-      <div className="text-terminal-green text-sm sm:text-base font-mono text-left px-4">
-        <div className="flex">
-          <span>║  </span>
-          <span className="text-white flex-1 pr-4">{question.question}</span>
-          <span>║</span>
+    <div className="text-center max-w-2xl mx-auto">
+      <div className="border-2 border-terminal-green p-4 sm:p-6">
+        {/* Checkpoint Header */}
+        <div className="text-terminal-red text-xl sm:text-2xl font-bold mb-4">
+          ⛔ COMPLIANCE CHECKPOINT ⛔
         </div>
-      </div>
 
-      <pre className="text-terminal-green text-sm sm:text-base leading-tight">
-{`║                                                                              ║
-╠══════════════════════════════════════════════════════════════════════════════╣
-║                                                                              ║`}
-      </pre>
-
-      <div className="text-terminal-green text-sm sm:text-base font-mono text-left px-4 space-y-1">
-        {question.options.map((option, i) => (
-          <div key={i} className="flex">
-            <span>║    </span>
-            <span className="text-terminal-cyan flex-1">{option}</span>
-            <span>║</span>
+        {/* Question */}
+        <div className="border-2 border-terminal-cyan p-4 mb-4">
+          <div className="text-terminal-cyan text-sm mb-2">AUDITOR'S QUESTION:</div>
+          <div className="text-white text-base sm:text-lg">
+            {question.question}
           </div>
-        ))}
-      </div>
+        </div>
 
-      <pre className="text-terminal-green text-sm sm:text-base leading-tight">
-{`║                                                                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝`}
-      </pre>
-
-      <div className="mt-6 flex justify-center gap-4">
-        <button className="terminal-btn" onClick={() => onAnswer('A')}>A</button>
-        <button className="terminal-btn" onClick={() => onAnswer('B')}>B</button>
-        <button className="terminal-btn" onClick={() => onAnswer('C')}>C</button>
-        <button className="terminal-btn" onClick={() => onAnswer('D')}>D</button>
+        {/* Options */}
+        <div className="space-y-2 text-left">
+          {question.options.map((option, i) => {
+            const letter = option.charAt(0);
+            return (
+              <button
+                key={i}
+                className="w-full text-left p-3 border border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg transition-colors text-sm sm:text-base"
+                onClick={() => onAnswer(letter)}
+              >
+                {option}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

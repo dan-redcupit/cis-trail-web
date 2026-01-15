@@ -21,8 +21,8 @@ html, body {
   background-color: var(--terminal-bg);
   color: var(--terminal-green);
   font-family: 'VT323', 'Courier New', monospace;
-  font-size: 18px;
-  line-height: 1.4;
+  font-size: 24px;
+  line-height: 1.5;
   min-height: 100vh;
   margin: 0;
   padding: 0;
@@ -71,11 +71,11 @@ body::before {
 /* Button styling */
 .terminal-btn {
   background: transparent;
-  border: 1px solid var(--terminal-green);
+  border: 2px solid var(--terminal-green);
   color: var(--terminal-green);
-  padding: 8px 16px;
+  padding: 12px 24px;
   font-family: 'VT323', monospace;
-  font-size: 18px;
+  font-size: 24px;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -94,11 +94,11 @@ body::before {
 .terminal-input {
   background: transparent;
   border: none;
-  border-bottom: 1px solid var(--terminal-green);
+  border-bottom: 2px solid var(--terminal-green);
   color: var(--terminal-green);
   font-family: 'VT323', monospace;
-  font-size: 18px;
-  padding: 4px 8px;
+  font-size: 24px;
+  padding: 8px 12px;
   outline: none;
 }
 
