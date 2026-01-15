@@ -168,20 +168,17 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return { ...state, screen: 'trail', animationFrame: state.animationFrame + 1 };
 
     case 'CONTINUE_TRAIL': {
-      // River crossings at 400, 800, 1200, 1600 miles (20% of journey each)
-      const riverMilestones = [400, 800, 1200, 1600];
+      // River crossing at ~500 miles and ~1500 miles (2 total)
+      const riverMilestones = [500, 1500];
       for (const milestone of riverMilestones) {
         if (state.milesTraveled < milestone && state.milesTraveled + 200 >= milestone) {
           return { ...state, screen: 'river' };
         }
       }
 
-      // Valley of Despair at 600 and 1400 miles
-      const valleyMilestones = [600, 1400];
-      for (const milestone of valleyMilestones) {
-        if (state.milesTraveled < milestone && state.milesTraveled + 200 >= milestone) {
-          return { ...state, screen: 'valley_of_despair' };
-        }
+      // Valley of Despair at ~1000 miles (midpoint - 1 total)
+      if (state.milesTraveled < 1000 && state.milesTraveled + 200 >= 1000) {
+        return { ...state, screen: 'valley_of_despair' };
       }
 
       // Check for random event (35% chance)
