@@ -12,6 +12,8 @@ export type Screen =
   | 'supplies'
   | 'hunting'
   | 'resting'
+  | 'river'
+  | 'valley_of_despair'
   | 'gameover'
   | 'victory'
   | 'leaderboard';
@@ -33,7 +35,12 @@ export interface GameState {
   usedQuestions: number[];
   currentQuestion: Question | null;
   currentEvent: GameEvent | null;
-  lastAnswer: { correct: boolean; explanation: string; answer: string } | null;
+  lastAnswer: {
+    quality: 'best' | 'good' | 'wrong';
+    explanation: string;
+    bestAnswer: string;
+    goodExplanation?: string;
+  } | null;
   lastDeath: { name: string; message: string } | null;
   huntingResult: { findings: number; severity: 'critical' | 'moderate' | 'low' } | null;
   gameOverReason: string;
@@ -66,7 +73,13 @@ export type GameAction =
   | { type: 'VICTORY' }
   | { type: 'RESTART' }
   | { type: 'SHOW_LEADERBOARD' }
-  | { type: 'CLOSE_LEADERBOARD' };
+  | { type: 'CLOSE_LEADERBOARD' }
+  | { type: 'RIVER_CROSSING' }
+  | { type: 'FORD_RIVER' }
+  | { type: 'WAIT_FOR_FERRY' }
+  | { type: 'CAULK_AND_FLOAT' }
+  | { type: 'VALLEY_OF_DESPAIR' }
+  | { type: 'CONVINCE_LEADERSHIP'; success: boolean };
 
 export function getInitialState(): GameState {
   return {
@@ -155,6 +168,22 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return { ...state, screen: 'trail', animationFrame: state.animationFrame + 1 };
 
     case 'CONTINUE_TRAIL': {
+      // River crossings at 400, 800, 1200, 1600 miles (20% of journey each)
+      const riverMilestones = [400, 800, 1200, 1600];
+      for (const milestone of riverMilestones) {
+        if (state.milesTraveled < milestone && state.milesTraveled + 200 >= milestone) {
+          return { ...state, screen: 'river' };
+        }
+      }
+
+      // Valley of Despair at 600 and 1400 miles
+      const valleyMilestones = [600, 1400];
+      for (const milestone of valleyMilestones) {
+        if (state.milesTraveled < milestone && state.milesTraveled + 200 >= milestone) {
+          return { ...state, screen: 'valley_of_despair' };
+        }
+      }
+
       // Check for random event (35% chance)
       if (Math.random() < 0.35) {
         const event = getRandomEvent();
@@ -183,30 +212,46 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case 'ANSWER_QUESTION': {
       if (!state.currentQuestion) return state;
 
-      const correct = action.answer === state.currentQuestion.answer;
+      const q = state.currentQuestion;
+      const isBest = action.answer === q.bestAnswer;
+      const isGood = action.answer === q.goodAnswer;
+      const quality: 'best' | 'good' | 'wrong' = isBest ? 'best' : isGood ? 'good' : 'wrong';
+
       let newState = {
         ...state,
         questionsAnswered: state.questionsAnswered + 1,
         lastAnswer: {
-          correct,
-          explanation: state.currentQuestion.explanation,
-          answer: state.currentQuestion.answer
+          quality,
+          explanation: q.explanation,
+          bestAnswer: q.bestAnswer,
+          goodExplanation: q.goodExplanation,
         },
         screen: 'result' as Screen,
       };
 
-      if (correct) {
+      if (isBest) {
+        // BEST answer: Full rewards
         newState = {
           ...newState,
           correctAnswers: state.correctAnswers + 1,
           milesTraveled: Math.min(state.totalMiles, state.milesTraveled + 200),
-          morale: Math.min(100, state.morale + 10),
-          sprsScore: Math.min(110, state.sprsScore + 5),
+          morale: Math.min(100, state.morale + 15),
+          sprsScore: Math.min(110, state.sprsScore + 7),
         };
-      } else {
+      } else if (isGood) {
+        // GOOD answer: Partial credit, still counts as correct
         newState = {
           ...newState,
-          milesTraveled: state.milesTraveled + 50,
+          correctAnswers: state.correctAnswers + 1,
+          milesTraveled: Math.min(state.totalMiles, state.milesTraveled + 100),
+          morale: Math.min(100, state.morale + 5),
+          sprsScore: Math.min(110, state.sprsScore + 3),
+        };
+      } else {
+        // WRONG answer: Penalties
+        newState = {
+          ...newState,
+          milesTraveled: state.milesTraveled + 25,
           morale: Math.max(0, state.morale - 20),
           sprsScore: Math.max(-203, state.sprsScore - 10),
         };
@@ -394,6 +439,126 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case 'CLOSE_LEADERBOARD':
       return { ...state, screen: 'title' };
+
+    // === RIVER CROSSING ===
+    case 'RIVER_CROSSING':
+      return { ...state, screen: 'river' };
+
+    case 'FORD_RIVER': {
+      // 60% success, 30% lose supplies (morale), 10% death
+      const roll = Math.random();
+      if (roll < 0.10) {
+        const { party, victim } = killRandomMember(state.party);
+        if (victim) {
+          return {
+            ...state,
+            party,
+            lastDeath: { name: victim.name, message: "was swept away while fording the Legacy Systems River" },
+            milesTraveled: state.milesTraveled + 50,
+            screen: 'death'
+          };
+        }
+      } else if (roll < 0.40) {
+        return {
+          ...state,
+          morale: Math.max(0, state.morale - 25),
+          sprsScore: Math.max(-203, state.sprsScore - 10),
+          milesTraveled: state.milesTraveled + 50,
+          screen: 'trail',
+          animationFrame: state.animationFrame + 1
+        };
+      }
+      return {
+        ...state,
+        milesTraveled: state.milesTraveled + 75,
+        screen: 'trail',
+        animationFrame: state.animationFrame + 1
+      };
+    }
+
+    case 'WAIT_FOR_FERRY': {
+      // Safe but slow - lose time, small morale hit
+      return {
+        ...state,
+        milesTraveled: state.milesTraveled + 25,
+        morale: Math.max(0, state.morale - 10),
+        screen: 'trail',
+        animationFrame: state.animationFrame + 1
+      };
+    }
+
+    case 'CAULK_AND_FLOAT': {
+      // Risky! 50% success, 30% lose supplies, 20% death
+      const roll = Math.random();
+      if (roll < 0.20) {
+        const { party, victim } = killRandomMember(state.party);
+        if (victim) {
+          return {
+            ...state,
+            party,
+            lastDeath: { name: victim.name, message: "drowned when the caulked server rack sank in the Legacy River" },
+            milesTraveled: state.milesTraveled + 50,
+            screen: 'death'
+          };
+        }
+      } else if (roll < 0.50) {
+        return {
+          ...state,
+          morale: Math.max(0, state.morale - 30),
+          sprsScore: Math.max(-203, state.sprsScore - 15),
+          milesTraveled: state.milesTraveled + 50,
+          screen: 'trail',
+          animationFrame: state.animationFrame + 1
+        };
+      }
+      return {
+        ...state,
+        milesTraveled: state.milesTraveled + 100,
+        morale: Math.min(100, state.morale + 10),
+        screen: 'trail',
+        animationFrame: state.animationFrame + 1
+      };
+    }
+
+    // === VALLEY OF DESPAIR ===
+    case 'VALLEY_OF_DESPAIR':
+      return { ...state, screen: 'valley_of_despair' };
+
+    case 'CONVINCE_LEADERSHIP': {
+      if (action.success) {
+        return {
+          ...state,
+          morale: Math.min(100, state.morale + 30),
+          sprsScore: Math.min(110, state.sprsScore + 10),
+          milesTraveled: state.milesTraveled + 150,
+          screen: 'trail',
+          animationFrame: state.animationFrame + 1
+        };
+      } else {
+        // Failed to convince leadership
+        const roll = Math.random();
+        if (roll < 0.25) {
+          const { party, victim } = killRandomMember(state.party);
+          if (victim) {
+            return {
+              ...state,
+              party,
+              lastDeath: { name: victim.name, message: "quit in frustration after leadership denied CMMC funding... again" },
+              morale: Math.max(0, state.morale - 30),
+              screen: 'death'
+            };
+          }
+        }
+        return {
+          ...state,
+          morale: Math.max(0, state.morale - 30),
+          sprsScore: Math.max(-203, state.sprsScore - 5),
+          milesTraveled: state.milesTraveled + 50,
+          screen: 'trail',
+          animationFrame: state.animationFrame + 1
+        };
+      }
+    }
 
     default:
       return state;

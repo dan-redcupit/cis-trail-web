@@ -18,6 +18,8 @@ import GameOverScreen from '@/components/GameOverScreen';
 import VictoryScreen from '@/components/VictoryScreen';
 import LeaderboardScreen from '@/components/LeaderboardScreen';
 import NameEntryModal from '@/components/NameEntryModal';
+import RiverCrossingScreen from '@/components/RiverCrossingScreen';
+import ValleyOfDespairScreen from '@/components/ValleyOfDespairScreen';
 
 export default function Home() {
   const [state, dispatch] = useReducer(gameReducer, getInitialState());
@@ -92,8 +94,10 @@ export default function Home() {
   }, []);
 
   const handleDismissResult = useCallback(() => {
-    if (state.lastAnswer?.correct) {
+    if (state.lastAnswer?.quality === 'best') {
       sounds.playCorrect();
+    } else if (state.lastAnswer?.quality === 'good') {
+      sounds.playSelect();
     } else {
       sounds.playWrong();
     }
@@ -132,6 +136,32 @@ export default function Home() {
 
   const handleNameSkip = useCallback(() => {
     setShowNameEntry(false);
+  }, []);
+
+  // River crossing handlers
+  const handleFordRiver = useCallback(() => {
+    sounds.playWagonMove();
+    dispatch({ type: 'FORD_RIVER' });
+  }, []);
+
+  const handleWaitFerry = useCallback(() => {
+    sounds.playRest();
+    dispatch({ type: 'WAIT_FOR_FERRY' });
+  }, []);
+
+  const handleCaulkFloat = useCallback(() => {
+    sounds.playScanning();
+    dispatch({ type: 'CAULK_AND_FLOAT' });
+  }, []);
+
+  // Valley of Despair handler
+  const handleConvinceLeadership = useCallback((success: boolean) => {
+    if (success) {
+      sounds.playCorrect();
+    } else {
+      sounds.playWrong();
+    }
+    dispatch({ type: 'CONVINCE_LEADERSHIP', success });
   }, []);
 
   // Calculate accuracy for leaderboard
@@ -202,9 +232,10 @@ export default function Home() {
       }
       return (
         <ResultScreen
-          correct={state.lastAnswer.correct}
+          quality={state.lastAnswer.quality}
           explanation={state.lastAnswer.explanation}
-          correctAnswer={state.lastAnswer.answer}
+          bestAnswer={state.lastAnswer.bestAnswer}
+          goodExplanation={state.lastAnswer.goodExplanation}
           onContinue={handleDismissResult}
         />
       );
@@ -254,6 +285,20 @@ export default function Home() {
 
     case 'hunting':
       return <HuntingScreen onFinish={handleFinishHunting} />;
+
+    case 'river':
+      return (
+        <RiverCrossingScreen
+          onFord={handleFordRiver}
+          onWait={handleWaitFerry}
+          onCaulk={handleCaulkFloat}
+        />
+      );
+
+    case 'valley_of_despair':
+      return (
+        <ValleyOfDespairScreen onConvince={handleConvinceLeadership} />
+      );
 
     case 'gameover':
       return (

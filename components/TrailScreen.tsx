@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { GameState } from '@/lib/gameState';
-import { playBrrrt, playJetEngine } from '@/lib/sounds';
+import { playBrrrt } from '@/lib/sounds';
 
 interface TrailScreenProps {
   state: GameState;
@@ -13,26 +13,29 @@ interface TrailScreenProps {
   onGiveUp: () => void;
 }
 
-// A-10 Warthog ASCII art frames
-const A10_FRAMES = [
+// M1 Abrams Tank ASCII art frames
+const TANK_FRAMES = [
   // Frame 1 - Normal
-  `     _______________
-    /                 \\__
-===|  [=====GAU-8=====]  |>>>>
-   |  USAF   ◯    ◯   |__/
-    \\_____|_______|_____/`,
+  `       _______________
+      |  M1 ABRAMS   |
+  ____|_____▄▄▄______|____
+ /    ════════════════════>
+|  ●●●●●●●●●●●●●●●●●●●●  |
+ \\▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄/`,
   // Frame 2 - Firing
-  `     _______________
-    /                 \\__
-===|  [=====GAU-8=====]  |>>>>  BRRRRRT!
-   |  USAF   ◯    ◯   |__/    ·····
-    \\_____|_______|_____/       ···`,
-  // Frame 3 - More firing
-  `     _______________
-    /                 \\__
-===|  [=====GAU-8=====]  |>>>> BRRRRRRRRRT!!!
-   |  USAF   ◯    ◯   |__/   ········
-    \\_____|_______|_____/      ·····`,
+  `       _______________
+      |  M1 ABRAMS   |
+  ____|_____▄▄▄______|____
+ /    ════════════════════>══●
+|  ●●●●●●●●●●●●●●●●●●●●  |   ★
+ \\▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄/`,
+  // Frame 3 - Heavy firing
+  `       _______________
+      |  M1 ABRAMS   |
+  ____|_____▄▄▄______|____
+ /    ════════════════════>═══●●●
+|  ●●●●●●●●●●●●●●●●●●●●  |    ★★★
+ \\▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄/   BOOM!`,
 ];
 
 // Landscape elements
@@ -52,9 +55,8 @@ const SERVER_RACK = ` ___
 
 export default function TrailScreen({ state, onContinue, onRest, onHunt, onSupplies, onGiveUp }: TrailScreenProps) {
   const [frame, setFrame] = useState(0);
-  const [a10Position, setA10Position] = useState(0);
-  const [showBrrrt, setShowBrrrt] = useState(false);
-  const [bulletTrails, setBulletTrails] = useState<string[]>([]);
+  const [trackOffset, setTrackOffset] = useState(0);
+  const [showFiring, setShowFiring] = useState(false);
 
   const progressPct = (state.milesTraveled / state.totalMiles) * 100;
   const milesRemaining = state.totalMiles - state.milesTraveled;
@@ -62,44 +64,25 @@ export default function TrailScreen({ state, onContinue, onRest, onHunt, onSuppl
   const filled = Math.floor((state.milesTraveled / state.totalMiles) * progressBarLen);
   const progressBar = '█'.repeat(filled) + '░'.repeat(progressBarLen - filled);
 
-  // Animation loop
+  // Animation loop - tank tracks move, scenery scrolls
   useEffect(() => {
     const interval = setInterval(() => {
       setFrame(f => (f + 1) % 3);
-      setA10Position(p => {
-        const newPos = p + 2;
-        if (newPos > 100) return 0;
-        return newPos;
-      });
-    }, 150);
+      setTrackOffset(t => (t + 1) % 20);
+    }, 200);
 
     return () => clearInterval(interval);
   }, []);
 
-  // Play jet engine sound periodically
-  useEffect(() => {
-    if (a10Position === 0) {
-      playJetEngine();
-    }
-  }, [a10Position]);
-
-  // Handle BRRRT firing
-  const handleBrrrt = () => {
-    setShowBrrrt(true);
+  // Handle main gun firing
+  const handleFire = () => {
+    setShowFiring(true);
     playBrrrt();
 
-    // Create bullet trails
-    const trails = ['·····', '········', '············', '····', '········'];
-    setBulletTrails(trails);
-
     setTimeout(() => {
-      setShowBrrrt(false);
-      setBulletTrails([]);
+      setShowFiring(false);
     }, 800);
   };
-
-  // Calculate A-10 display position
-  const a10Left = `${Math.min(a10Position, 60)}%`;
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -109,65 +92,55 @@ export default function TrailScreen({ state, onContinue, onRest, onHunt, onSuppl
       </div>
 
       {/* Animated Scene */}
-      <div className="border-2 border-terminal-green p-2 mb-2 overflow-hidden relative" style={{ height: '140px' }}>
-        {/* Sky with clouds */}
-        <div className="absolute top-0 left-0 w-full text-terminal-cyan opacity-50 text-xs">
-          <span style={{ position: 'absolute', left: '10%', top: '5px' }}>☁</span>
-          <span style={{ position: 'absolute', left: '45%', top: '10px' }}>☁</span>
-          <span style={{ position: 'absolute', left: '75%', top: '5px' }}>☁</span>
+      <div className="border-2 border-terminal-green p-2 mb-2 overflow-hidden relative" style={{ height: '150px' }}>
+        {/* Scrolling background scenery */}
+        <div className="absolute top-1 w-full text-terminal-cyan text-xs opacity-60">
+          <span style={{ position: 'absolute', left: `${(100 - trackOffset * 3) % 100}%` }}>▲</span>
+          <span style={{ position: 'absolute', left: `${(60 - trackOffset * 3) % 100}%` }}>▲▲</span>
+          <span style={{ position: 'absolute', left: `${(30 - trackOffset * 3) % 100}%` }}>▲</span>
         </div>
 
-        {/* A-10 Warthog */}
-        <div
-          className="absolute transition-all duration-150 ease-linear"
-          style={{ left: a10Left, top: '15px' }}
-        >
-          <pre className={`text-xs leading-none ${showBrrrt ? 'text-terminal-yellow' : 'text-terminal-green'}`}>
-{showBrrrt ? A10_FRAMES[frame === 0 ? 1 : 2] : A10_FRAMES[0]}
+        {/* M1 Abrams Tank - centered */}
+        <div className="absolute left-4" style={{ top: '35px' }}>
+          <pre className={`text-[9px] sm:text-[11px] leading-tight font-mono ${showFiring ? 'text-terminal-yellow' : 'text-terminal-green'}`}>
+{showFiring ? TANK_FRAMES[frame === 0 ? 1 : 2] : TANK_FRAMES[0]}
           </pre>
-          {/* Bullet trails */}
-          {showBrrrt && (
-            <div className="absolute text-terminal-yellow text-xs" style={{ left: '200px', top: '10px' }}>
-              {bulletTrails.map((trail, i) => (
-                <div key={i} style={{ marginLeft: `${i * 15}px` }}>{trail}</div>
-              ))}
-            </div>
-          )}
         </div>
 
-        {/* Ground with server racks and mountains */}
+        {/* Scrolling ground */}
         <div className="absolute bottom-0 left-0 w-full">
-          <pre className="text-terminal-cyan text-xs leading-tight">
-{'═'.repeat(80)}
-          </pre>
-          {/* Server racks representing targets */}
-          <div className="absolute bottom-2 flex justify-around w-full text-xs text-terminal-red opacity-70">
-            <span>▄▄</span>
-            <span>▄▄▄</span>
-            <span>▄▄</span>
-            <span>▄▄▄▄</span>
-            <span>▄▄</span>
+          {/* Ground line */}
+          <div className="text-terminal-cyan text-xs overflow-hidden whitespace-nowrap">
+            {'═'.repeat(100)}
+          </div>
+          {/* Scrolling terrain features */}
+          <div className="absolute bottom-3 w-full text-xs overflow-hidden" style={{ transform: `translateX(-${trackOffset * 5}px)` }}>
+            <span className="text-terminal-red mx-8">▄▄</span>
+            <span className="text-terminal-yellow mx-12">⚠</span>
+            <span className="text-terminal-red mx-8">▄▄▄</span>
+            <span className="text-terminal-cyan mx-16">≋≋≋</span>
+            <span className="text-terminal-red mx-8">▄▄</span>
           </div>
         </div>
 
         {/* Destination marker */}
-        <div className="absolute bottom-4 right-4 text-terminal-green text-xs text-right">
+        <div className="absolute bottom-4 right-2 text-terminal-green text-xs text-right">
           <div>CMMC 2.0</div>
-          <div>▶ CERTIFIED</div>
+          <div>→ {milesRemaining}mi</div>
         </div>
       </div>
 
-      {/* BRRRT Button */}
+      {/* FIRE Button */}
       <button
         className={`w-full mb-2 py-2 font-bold border-2 transition-all ${
-          showBrrrt
+          showFiring
             ? 'bg-terminal-yellow text-black border-terminal-yellow animate-pulse'
             : 'border-terminal-yellow text-terminal-yellow hover:bg-terminal-yellow hover:text-black'
         }`}
-        onClick={handleBrrrt}
-        disabled={showBrrrt}
+        onClick={handleFire}
+        disabled={showFiring}
       >
-        {showBrrrt ? '🔥 BRRRRRRRRRT!!! 🔥' : '💥 FIRE GAU-8 (BRRRT!) 💥'}
+        {showFiring ? '💥 BOOM!!! 💥' : '🎯 FIRE 120MM MAIN GUN 🎯'}
       </button>
 
       {/* Status Panel */}

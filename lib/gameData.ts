@@ -2,8 +2,10 @@ export interface Question {
   id: number;
   question: string;
   options: string[];
-  answer: string;
+  bestAnswer: string;      // Perfect answer - full points
+  goodAnswer: string;      // Close second - partial credit
   explanation: string;
+  goodExplanation: string; // Feedback for the "good" answer
 }
 
 export interface GameEvent {
@@ -63,362 +65,422 @@ export const CMMC_QUESTIONS: Question[] = [
     question: "What does CUI stand for?",
     options: [
       "A) Controlled Unclassified Information",
-      "B) Cybersecurity Unified Infrastructure",
-      "C) Compliance Under Investigation",
-      "D) Computers Under Inspection"
+      "B) Confidential Unclassified Information",
+      "C) Cybersecurity Unified Infrastructure",
+      "D) Compliance Under Investigation"
     ],
-    answer: "A",
-    explanation: "CUI = Controlled Unclassified Information. The whole reason we're on this trail!"
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "CUI = Controlled Unclassified Information. The whole reason we're on this trail!",
+    goodExplanation: "Close! It's 'Controlled' not 'Confidential' - an important distinction in federal terminology."
   },
   {
     id: 2,
     question: "How many practices/controls are in CMMC Level 2?",
     options: [
-      "A) 17",
-      "B) 110",
-      "C) 172",
+      "A) 110",
+      "B) 130 (110 + 20 enhancements)",
+      "C) 17",
       "D) 42 (the answer to everything)"
     ],
-    answer: "B",
-    explanation: "110 practices from NIST SP 800-171. You'll know them by heart... or die trying."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "110 practices from NIST SP 800-171. You'll know them by heart... or die trying.",
+    goodExplanation: "Good thinking about enhancements, but Level 2 is specifically the 110 base controls."
   },
   {
     id: 3,
     question: "What is an SSP?",
     options: [
-      "A) Super Secret Protocol",
-      "B) System Security Plan",
-      "C) SPRS Score Predictor",
-      "D) Security Specialist Party"
+      "A) System Security Plan",
+      "B) Security System Policy",
+      "C) Super Secret Protocol",
+      "D) SPRS Score Predictor"
     ],
-    answer: "B",
-    explanation: "System Security Plan - the document that will consume your next 6 months."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "System Security Plan - the document that will consume your next 6 months.",
+    goodExplanation: "Close! Policies are part of it, but SSP = System Security Plan specifically."
   },
   {
     id: 4,
     question: "What is the minimum SPRS score possible?",
     options: [
-      "A) 0",
-      "B) -203",
-      "C) -100",
+      "A) -203",
+      "B) -110 (one point per control)",
+      "C) 0",
       "D) Your self-esteem after an audit"
     ],
-    answer: "B",
-    explanation: "-203 is the minimum. If you're there, may your documentation be thorough."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "-203 is the minimum. If you're there, may your documentation be thorough.",
+    goodExplanation: "Good logic, but the actual math results in -203 based on weighted controls."
   },
   {
     id: 5,
     question: "What does FCI stand for?",
     options: [
       "A) Federal Contract Information",
-      "B) Firewall Configuration Index",
-      "C) First Compliance Incident",
+      "B) Federal Controlled Information",
+      "C) Firewall Configuration Index",
       "D) Finally Certified, Incredible"
     ],
-    answer: "A",
-    explanation: "Federal Contract Information - the less scary cousin of CUI."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Federal Contract Information - the less scary cousin of CUI.",
+    goodExplanation: "Close! FCI is 'Contract' not 'Controlled' - it's less sensitive than CUI."
   },
   {
     id: 6,
     question: "What NIST publication does CMMC Level 2 align with?",
     options: [
-      "A) NIST 800-53",
-      "B) NIST 800-171",
-      "C) NIST 800-HELP-ME",
-      "D) NIST 800-WHY"
+      "A) NIST SP 800-171",
+      "B) NIST SP 800-53",
+      "C) NIST SP 800-171A",
+      "D) NIST SP 800-HELP-ME"
     ],
-    answer: "B",
-    explanation: "NIST SP 800-171. Your new bedtime reading material."
+    bestAnswer: "A",
+    goodAnswer: "C",
+    explanation: "NIST SP 800-171. Your new bedtime reading material.",
+    goodExplanation: "800-171A is the assessment guide - good knowledge! But 800-171 defines the controls."
   },
   {
     id: 7,
     question: "What is a POA&M?",
     options: [
       "A) Plan of Action & Milestones",
-      "B) Policy on Audits & Management",
-      "C) Proof of Acceptable Monitoring",
+      "B) Plan of Assessment & Metrics",
+      "C) Policy on Audits & Management",
       "D) Pain, Anguish & Misery"
     ],
-    answer: "A",
-    explanation: "Plan of Action & Milestones. (D is also technically correct in practice.)"
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Plan of Action & Milestones. (D is also technically correct in practice.)",
+    goodExplanation: "Assessment and metrics are related, but it's Action & Milestones specifically."
   },
   {
     id: 8,
     question: "Who performs CMMC Level 2 assessments?",
     options: [
-      "A) The DoD directly",
-      "B) C3PAO (Third-Party Assessment Org)",
+      "A) C3PAO (Third-Party Assessment Org)",
+      "B) DCMA (Defense Contract Management Agency)",
       "C) Your IT guy who 'knows security'",
       "D) A ouija board"
     ],
-    answer: "B",
-    explanation: "C3PAO - the people who will make you question every life decision."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "C3PAO - the people who will make you question every life decision.",
+    goodExplanation: "DCMA handles DIBCAC assessments, but C3PAOs do CMMC Level 2 specifically."
   },
   {
     id: 9,
     question: "What is 'scoping' in CMMC?",
     options: [
-      "A) Looking through a telescope at servers",
-      "B) Defining systems that process/store CUI",
-      "C) Checking if anyone is watching",
+      "A) Defining systems that process/store CUI",
+      "B) Identifying all assets touching federal data",
+      "C) Looking through a telescope at servers",
       "D) Running away from auditors"
     ],
-    answer: "B",
-    explanation: "Proper scoping can save you from certifying your entire company."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Proper scoping can save you from certifying your entire company.",
+    goodExplanation: "That's part of it! But scoping specifically focuses on CUI boundaries."
   },
   {
     id: 10,
     question: "What is the purpose of FIPS 140-2 validated encryption?",
     options: [
-      "A) To make data extra crispy",
-      "B) Ensure crypto modules meet standards",
-      "C) To confuse developers",
+      "A) Ensure crypto modules meet federal standards",
+      "B) Verify encryption strength is adequate",
+      "C) To make data extra crispy",
       "D) Justify expensive hardware purchases"
     ],
-    answer: "B",
-    explanation: "FIPS 140-2 validates your encryption isn't just 'password123' with extra steps."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "FIPS 140-2 validates your encryption isn't just 'password123' with extra steps.",
+    goodExplanation: "Strength matters, but FIPS specifically validates the module meets federal standards."
   },
   {
     id: 11,
     question: "What is an enclave in CMMC context?",
     options: [
-      "A) A secret government bunker",
-      "B) Segmented network boundary with CUI",
-      "C) Where compliance officers cry",
-      "D) A fancy word for 'server room'"
+      "A) Segmented network boundary containing CUI",
+      "B) Isolated security zone for sensitive data",
+      "C) A secret government bunker",
+      "D) Where compliance officers cry"
     ],
-    answer: "B",
-    explanation: "An enclave is a properly segmented environment. (C is also valid.)"
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "An enclave is a properly segmented environment. (D is also valid.)",
+    goodExplanation: "Good concept! But enclave specifically refers to CUI boundaries, not just any sensitive data."
   },
   {
     id: 12,
-    question: "How often should security awareness training occur?",
+    question: "How often should security awareness training occur per CMMC?",
     options: [
-      "A) Never, ignorance is bliss",
-      "B) Once per decade",
-      "C) Annually at minimum",
+      "A) Annually at minimum",
+      "B) Upon hire and when threats change",
+      "C) Never, ignorance is bliss",
       "D) Every phishing click (so, daily)"
     ],
-    answer: "C",
-    explanation: "Annual training minimum. D would mean continuous training for most orgs."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Annual training minimum. D would mean continuous training for most orgs.",
+    goodExplanation: "New hire and threat-based training is good practice, but annual minimum is the requirement."
   },
   {
     id: 13,
     question: "What does MFA stand for?",
     options: [
       "A) Multi-Factor Authentication",
-      "B) Mandatory Firewall Application",
-      "C) Most Frustrating Approach",
+      "B) Multiple Forms of Authentication",
+      "C) Mandatory Firewall Application",
       "D) My Favorite Acronym"
     ],
-    answer: "A",
-    explanation: "Multi-Factor Authentication - because passwords alone aren't enough."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Multi-Factor Authentication - because passwords alone aren't enough.",
+    goodExplanation: "Same concept, different wording! The official term is Multi-Factor."
   },
   {
     id: 14,
     question: "What is the CMMC Level 1 requirement for CUI?",
     options: [
-      "A) Full NIST 800-171 compliance",
-      "B) Level 1 is for FCI only, not CUI",
+      "A) Level 1 is for FCI only, not CUI",
+      "B) Level 1 covers basic CUI handling",
       "C) Just install antivirus",
       "D) Post a 'No Hackers' sign"
     ],
-    answer: "B",
-    explanation: "Level 1 is FCI only (17 practices). CUI requires Level 2 minimum!"
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Level 1 is FCI only (17 practices). CUI requires Level 2 minimum!",
+    goodExplanation: "Tricky! Level 1 does NOT cover CUI at all - that requires Level 2."
   },
   {
     id: 15,
     question: "What is a 'NOT MET' finding?",
     options: [
-      "A) An auditor you haven't met",
-      "B) Control that fails requirements",
-      "C) A meeting that was cancelled",
-      "D) The last thing you want to hear"
+      "A) Control that fails to meet requirements",
+      "B) Control with insufficient evidence",
+      "C) An auditor you haven't met",
+      "D) A meeting that was cancelled"
     ],
-    answer: "B",
-    explanation: "A NOT MET means you failed a control. B and D are both correct."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "A NOT MET means you failed a control. Both A and B lead to this result.",
+    goodExplanation: "Insufficient evidence often results in NOT MET, but it specifically means the control wasn't satisfied."
   },
   {
     id: 16,
     question: "What system holds your SPRS score?",
     options: [
-      "A) The Cloud",
-      "B) A blockchain somewhere",
-      "C) Supplier Performance Risk System",
+      "A) Supplier Performance Risk System",
+      "B) SPRS Portal (sam.gov integration)",
+      "C) The Cloud",
       "D) A filing cabinet in the Pentagon"
     ],
-    answer: "C",
-    explanation: "SPRS - Supplier Performance Risk System. Your score lives there."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "SPRS - Supplier Performance Risk System. Your score lives there.",
+    goodExplanation: "It does integrate with SAM.gov! But SPRS itself is the Supplier Performance Risk System."
   },
   {
     id: 17,
     question: "What is 'evidence' in a CMMC assessment?",
     options: [
-      "A) Screenshots of you doing work",
-      "B) Docs proving control implementation",
-      "C) Witness testimonies",
-      "D) All of the above, honestly"
+      "A) Documentation proving control implementation",
+      "B) Artifacts demonstrating security practices",
+      "C) Screenshots of you doing work",
+      "D) Witness testimonies under oath"
     ],
-    answer: "B",
-    explanation: "Evidence = proof your controls work. Screenshots, policies, logs - all of it."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Evidence = proof your controls work. Screenshots, policies, logs - all of it.",
+    goodExplanation: "Artifacts are evidence! The key is they must prove the control is implemented."
   },
   {
     id: 18,
-    question: "How long must you retain security logs per 800-171?",
+    question: "How long must you retain security logs per NIST 800-171?",
     options: [
-      "A) 30 days",
-      "B) 90 days minimum",
-      "C) Until heat death of universe",
-      "D) Logs? What logs?"
+      "A) 90 days minimum",
+      "B) 1 year recommended",
+      "C) 30 days",
+      "D) Until heat death of universe"
     ],
-    answer: "B",
-    explanation: "90 days minimum retention. Your SIEM storage costs just increased."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "90 days minimum retention. Your SIEM storage costs just increased.",
+    goodExplanation: "1 year is best practice and often required by contracts, but 800-171 says 90 days minimum."
   },
   {
     id: 19,
-    question: "What does 800-171A provide?",
+    question: "What does NIST 800-171A provide?",
     options: [
       "A) Assessment procedures for controls",
-      "B) A way for auditors to feel important",
+      "B) Detailed control implementation guidance",
       "C) More acronyms",
       "D) Job security for consultants"
     ],
-    answer: "A",
-    explanation: "800-171A tells you HOW you'll be assessed. Know it. Fear it."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "800-171A tells you HOW you'll be assessed. Know it. Fear it.",
+    goodExplanation: "It helps with implementation too, but it's specifically the assessment procedures document."
   },
   {
     id: 20,
     question: "What should you do if you discover a CUI breach?",
     options: [
       "A) Report to DoD within 72 hours",
-      "B) Delete evidence and hope",
-      "C) Blame the intern",
+      "B) Report to CISA within 24 hours",
+      "C) Delete evidence and hope",
       "D) Update LinkedIn to 'Open to Work'"
     ],
-    answer: "A",
-    explanation: "Report to DoD within 72 hours via dibnet.dod.mil. (D is the mood though.)"
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Report to DoD within 72 hours via dibnet.dod.mil. (D is the mood though.)",
+    goodExplanation: "CISA reporting is for critical infrastructure - DoD breach reporting is via DIBNET within 72 hours."
   },
   // === PHASE 1: PLANNING & PREPARATION ===
   {
     id: 21,
     question: "What is Phase 1 of the CMMC assessment process?",
     options: [
-      "A) Assessment Execution",
-      "B) Planning & Preparation",
-      "C) Reporting",
+      "A) Planning & Preparation",
+      "B) Pre-Assessment Readiness",
+      "C) Assessment Execution",
       "D) Crying in the break room"
     ],
-    answer: "B",
-    explanation: "Phase 1 is Planning & Preparation - defining scope, reviewing readiness, and scheduling."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Phase 1 is Planning & Preparation - defining scope, reviewing readiness, and scheduling.",
+    goodExplanation: "Readiness is part of it! But the official phase name is Planning & Preparation."
   },
   {
     id: 22,
     question: "During Phase 1, who must affirm the accuracy of the SPRS score?",
     options: [
-      "A) The IT intern",
-      "B) A senior company official",
-      "C) The C3PAO",
+      "A) A senior company official",
+      "B) The CISO or security lead",
+      "C) The IT intern",
       "D) Anyone with a pulse"
     ],
-    answer: "B",
-    explanation: "A senior official must affirm the SPRS score accuracy - it's a legal attestation!"
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "A senior official must affirm the SPRS score accuracy - it's a legal attestation!",
+    goodExplanation: "The CISO might do it, but it must be a senior official with authority to attest."
   },
   {
     id: 23,
     question: "What document defines the assessment boundary in Phase 1?",
     options: [
-      "A) The scoping guide",
-      "B) The employee handbook",
+      "A) The scoping guide/asset inventory",
+      "B) The System Security Plan (SSP)",
       "C) A post-it note",
       "D) The network diagram nobody updated"
     ],
-    answer: "A",
-    explanation: "The scoping guide helps define which assets are in-scope for CUI processing."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "The scoping guide helps define which assets are in-scope for CUI processing.",
+    goodExplanation: "The SSP does describe boundaries! But the scoping guide/inventory specifically defines assessment scope."
   },
   {
     id: 24,
     question: "What are the 5 asset categories for CMMC scoping?",
     options: [
-      "A) CUI, Security, Contractor, Specialty, Out-of-Scope",
-      "B) Red, Blue, Green, Yellow, Purple",
-      "C) Easy, Medium, Hard, Expert, Impossible",
+      "A) CUI, Security Protection, Contractor Risk Managed, Specialized, Out-of-Scope",
+      "B) Critical, High, Medium, Low, Informational",
+      "C) Red, Blue, Green, Yellow, Purple",
       "D) Servers, Laptops, Phones, Printers, Feelings"
     ],
-    answer: "A",
-    explanation: "CUI Assets, Security Protection Assets, Contractor Risk Managed, Specialized, and Out-of-Scope."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "CUI Assets, Security Protection Assets, Contractor Risk Managed, Specialized, and Out-of-Scope.",
+    goodExplanation: "That's a risk classification! CMMC uses specific asset categories for scoping."
   },
   {
     id: 25,
     question: "How far in advance should you schedule your C3PAO assessment?",
     options: [
-      "A) 2-3 days",
-      "B) 3-6 months typically",
+      "A) 3-6 months typically",
+      "B) 6-12 months for complex environments",
       "C) The night before",
       "D) Never, live in denial forever"
     ],
-    answer: "B",
-    explanation: "Plan 3-6 months ahead - C3PAOs book up fast and you need prep time!"
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Plan 3-6 months ahead - C3PAOs book up fast and you need prep time!",
+    goodExplanation: "For complex environments, more time is wise! 3-6 months is the typical guidance."
   },
   // === PHASE 2: ASSESSMENT EXECUTION ===
   {
     id: 26,
     question: "What is Phase 2 of the CMMC assessment?",
     options: [
-      "A) Planning & Preparation",
-      "B) Assessment Execution",
-      "C) Adjudication",
+      "A) Assessment Execution",
+      "B) Evidence Collection & Testing",
+      "C) Planning & Preparation",
       "D) The denial phase"
     ],
-    answer: "B",
-    explanation: "Phase 2 is Assessment Execution - where the C3PAO actually tests your controls."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Phase 2 is Assessment Execution - where the C3PAO actually tests your controls.",
+    goodExplanation: "Evidence collection and testing happen during Assessment Execution - that's the official name."
   },
   {
     id: 27,
     question: "What are the three assessment methods used in Phase 2?",
     options: [
       "A) Examine, Interview, Test",
-      "B) Hope, Pray, Cry",
-      "C) Read, Write, Arithmetic",
+      "B) Review, Validate, Verify",
+      "C) Hope, Pray, Cry",
       "D) Google, Stack Overflow, ChatGPT"
     ],
-    answer: "A",
-    explanation: "Examine (review docs), Interview (talk to staff), Test (verify controls work)."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Examine (review docs), Interview (talk to staff), Test (verify controls work).",
+    goodExplanation: "Similar concepts! But the official NIST terms are Examine, Interview, and Test."
   },
   {
     id: 28,
     question: "During interviews, who should be available to the assessors?",
     options: [
-      "A) Only the CISO",
-      "B) Personnel responsible for implementing controls",
-      "C) The CEO's assistant",
+      "A) Personnel responsible for implementing controls",
+      "B) Anyone with knowledge of security operations",
+      "C) Only the CISO",
       "D) Literally anyone who can fog a mirror"
     ],
-    answer: "B",
-    explanation: "People who actually implement and operate the controls must be available."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "People who actually implement and operate the controls must be available.",
+    goodExplanation: "Security ops knowledge helps, but specifically those responsible for the controls being assessed."
   },
   {
     id: 29,
     question: "What happens if evidence is missing during Phase 2?",
     options: [
-      "A) Assessors just skip it",
-      "B) The control may be marked NOT MET",
+      "A) The control may be marked NOT MET",
+      "B) You get a chance to provide it later",
       "C) Everyone gets a participation trophy",
       "D) The audit magically passes anyway"
     ],
-    answer: "B",
-    explanation: "No evidence = NOT MET. Document everything or suffer the consequences!"
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "No evidence = NOT MET. Document everything or suffer the consequences!",
+    goodExplanation: "Limited real-time remediation exists, but missing evidence typically means NOT MET."
   },
   {
     id: 30,
     question: "Can you remediate findings during the assessment?",
     options: [
-      "A) Yes, real-time remediation is allowed",
-      "B) No, what's done is done",
-      "C) Only if you bribe the assessor (illegal)",
+      "A) Yes, limited real-time remediation is allowed",
+      "B) Yes, but only for documentation gaps",
+      "C) No, what's done is done",
       "D) Only on Tuesdays"
     ],
-    answer: "A",
-    explanation: "Limited real-time remediation is allowed for minor issues during assessment."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Limited real-time remediation is allowed for minor issues during assessment.",
+    goodExplanation: "Documentation is common, but real-time remediation can apply to minor technical fixes too."
   },
   // === PHASE 3: REPORTING ===
   {
@@ -426,60 +488,70 @@ export const CMMC_QUESTIONS: Question[] = [
     question: "What is Phase 3 of the CMMC assessment?",
     options: [
       "A) Reporting",
-      "B) Celebration",
-      "C) Assessment Execution",
+      "B) Findings Documentation",
+      "C) Celebration",
       "D) The bargaining phase"
     ],
-    answer: "A",
-    explanation: "Phase 3 is Reporting - documenting findings and creating the assessment report."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Phase 3 is Reporting - documenting findings and creating the assessment report.",
+    goodExplanation: "Findings documentation is what happens in Reporting - that's the official phase name."
   },
   {
     id: 32,
     question: "What document lists all findings requiring remediation?",
     options: [
-      "A) The shame spreadsheet",
-      "B) Plan of Action & Milestones (POA&M)",
-      "C) The IT wish list",
+      "A) Plan of Action & Milestones (POA&M)",
+      "B) Corrective Action Plan (CAP)",
+      "C) The shame spreadsheet",
       "D) A very long sticky note"
     ],
-    answer: "B",
-    explanation: "The POA&M documents all NOT MET findings and remediation timelines."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "The POA&M documents all NOT MET findings and remediation timelines.",
+    goodExplanation: "CAP is similar terminology used elsewhere, but CMMC specifically uses POA&M."
   },
   {
     id: 33,
     question: "How long do you have to close POA&M items for conditional certification?",
     options: [
-      "A) 30 days",
-      "B) 180 days",
+      "A) 180 days",
+      "B) 1 year",
       "C) Forever, no rush",
       "D) It's already too late"
     ],
-    answer: "B",
-    explanation: "180 days to close POA&M items or your conditional certification may be revoked."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "180 days to close POA&M items or your conditional certification may be revoked.",
+    goodExplanation: "Some contracts may allow longer, but the CMMC standard is 180 days."
   },
   {
     id: 34,
     question: "What determines a MET vs NOT MET finding?",
     options: [
-      "A) Assessor's mood that day",
-      "B) Whether objectives are satisfied per 800-171A",
-      "C) A coin flip",
+      "A) Whether assessment objectives are satisfied per 800-171A",
+      "B) If the control is implemented and effective",
+      "C) Assessor's mood that day",
       "D) How good the coffee was"
     ],
-    answer: "B",
-    explanation: "Assessment objectives from NIST 800-171A determine MET/NOT MET status."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Assessment objectives from NIST 800-171A determine MET/NOT MET status.",
+    goodExplanation: "Implementation and effectiveness matter, but 800-171A objectives are the specific criteria."
   },
   {
     id: 35,
     question: "Who reviews the assessment report before submission?",
     options: [
       "A) The OSC (Organization Seeking Certification)",
-      "B) Nobody, YOLO",
-      "C) The janitor",
+      "B) The organization's legal/compliance team",
+      "C) Nobody, YOLO",
       "D) A magic 8-ball"
     ],
-    answer: "A",
-    explanation: "The OSC reviews the report for accuracy before the C3PAO submits to CMMC-AB."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "The OSC reviews the report for accuracy before the C3PAO submits to Cyber AB.",
+    goodExplanation: "Legal/compliance typically helps, but the OSC as an entity must review and approve."
   },
   // === PHASE 4: ADJUDICATION & CERTIFICATION ===
   {
@@ -487,60 +559,70 @@ export const CMMC_QUESTIONS: Question[] = [
     question: "What is Phase 4 of the CMMC assessment?",
     options: [
       "A) Adjudication & Certification",
-      "B) Victory lap",
-      "C) Planning",
+      "B) Final Review & Approval",
+      "C) Victory lap",
       "D) The acceptance phase"
     ],
-    answer: "A",
-    explanation: "Phase 4 is Adjudication - where CMMC-AB reviews and issues certification decisions."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Phase 4 is Adjudication - where Cyber AB reviews and issues certification decisions.",
+    goodExplanation: "Final review and approval describes what happens, but the official name is Adjudication."
   },
   {
     id: 37,
     question: "What are the two types of CMMC certification?",
     options: [
       "A) Conditional and Final",
-      "B) Temporary and Permanent",
-      "C) Good and Better",
+      "B) Provisional and Full",
+      "C) Temporary and Permanent",
       "D) Real and Imaginary"
     ],
-    answer: "A",
-    explanation: "Conditional (with POA&M items) or Final (all controls MET)."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Conditional (with POA&M items) or Final (all controls MET).",
+    goodExplanation: "Similar concept! But CMMC uses the terms Conditional and Final specifically."
   },
   {
     id: 38,
     question: "How long is a CMMC certification valid?",
     options: [
-      "A) Forever",
-      "B) 3 years",
-      "C) Until the next breach",
-      "D) 1 year"
+      "A) 3 years",
+      "B) 5 years with annual affirmations",
+      "C) Forever",
+      "D) Until the next breach"
     ],
-    answer: "B",
-    explanation: "CMMC certifications are valid for 3 years, then you get to do it all again!"
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "CMMC certifications are valid for 3 years, then you get to do it all again!",
+    goodExplanation: "Annual affirmations are required, but the cert itself is valid for 3 years."
   },
   {
     id: 39,
     question: "What happens if POA&M items aren't closed in 180 days?",
     options: [
-      "A) Nothing, extensions are automatic",
-      "B) Conditional certification may be revoked",
-      "C) You get a stern email",
+      "A) Conditional certification may be revoked",
+      "B) You must request an extension",
+      "C) Nothing, extensions are automatic",
       "D) Free pizza party"
     ],
-    answer: "B",
-    explanation: "Failure to close POA&M items can result in revocation of conditional certification."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "Failure to close POA&M items can result in revocation of conditional certification.",
+    goodExplanation: "Extensions may be possible, but the default consequence is potential revocation."
   },
   {
     id: 40,
     question: "Who issues the final CMMC certification?",
     options: [
-      "A) The C3PAO",
-      "B) The Cyber AB (formerly CMMC-AB)",
+      "A) The Cyber AB (formerly CMMC-AB)",
+      "B) The C3PAO after DoD approval",
       "C) Your mom (she's very proud)",
       "D) The DoD CIO directly"
     ],
-    answer: "B",
-    explanation: "The Cyber AB (Accreditation Body) issues certifications after reviewing C3PAO reports."
+    bestAnswer: "A",
+    goodAnswer: "B",
+    explanation: "The Cyber AB (Accreditation Body) issues certifications after reviewing C3PAO reports.",
+    goodExplanation: "C3PAOs conduct the assessment, but Cyber AB issues the actual certification."
   },
 ];
 
