@@ -1,16 +1,61 @@
 export interface Question {
   id: number;
   question: string;
-  options: string[];
-  bestAnswer: string;      // Perfect answer - full points
-  goodAnswer: string;      // Close second - partial credit
+  options: string[];           // Options WITHOUT letter prefixes
+  bestAnswerIndex: number;     // Index of best answer (0-3)
+  goodAnswerIndex: number;     // Index of good answer (0-3)
   explanation: string;
-  goodExplanation: string; // Feedback for the "good" answer
+  goodExplanation: string;
+}
+
+export interface ShuffledQuestion {
+  id: number;
+  question: string;
+  options: string[];           // Shuffled options WITH letter prefixes
+  bestAnswer: string;          // Letter of best answer after shuffle
+  goodAnswer: string;          // Letter of good answer after shuffle
+  explanation: string;
+  goodExplanation: string;
 }
 
 export interface GameEvent {
   text: string;
   type: 'death' | 'good' | 'bad' | 'neutral';
+}
+
+// Shuffle array using Fisher-Yates
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+// Get a shuffled question with randomized answer positions
+export function getShuffledQuestion(q: Question): ShuffledQuestion {
+  const letters = ['A', 'B', 'C', 'D'];
+  const indices = [0, 1, 2, 3];
+  const shuffledIndices = shuffleArray(indices);
+
+  const shuffledOptions = shuffledIndices.map((origIndex, newIndex) =>
+    `${letters[newIndex]}) ${q.options[origIndex]}`
+  );
+
+  // Find where the best and good answers ended up after shuffle
+  const bestNewIndex = shuffledIndices.indexOf(q.bestAnswerIndex);
+  const goodNewIndex = shuffledIndices.indexOf(q.goodAnswerIndex);
+
+  return {
+    id: q.id,
+    question: q.question,
+    options: shuffledOptions,
+    bestAnswer: letters[bestNewIndex],
+    goodAnswer: letters[goodNewIndex],
+    explanation: q.explanation,
+    goodExplanation: q.goodExplanation,
+  };
 }
 
 export const DEATH_MESSAGES: string[] = [
@@ -60,569 +105,738 @@ export const RANDOM_EVENTS: GameEvent[] = [
 ];
 
 export const CMMC_QUESTIONS: Question[] = [
+  // ============ BASIC CMMC CONCEPTS ============
   {
     id: 1,
     question: "What does CUI stand for?",
     options: [
-      "A) Controlled Unclassified Information",
-      "B) Confidential Unclassified Information",
-      "C) Cybersecurity Unified Infrastructure",
-      "D) Compliance Under Investigation"
+      "Controlled Unclassified Information",
+      "Confidential Unclassified Information",
+      "Cybersecurity Unified Infrastructure",
+      "Compliance Under Investigation"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "CUI = Controlled Unclassified Information. The whole reason we're on this trail!",
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "CUI = Controlled Unclassified Information, as defined in 32 CFR Part 2002.",
     goodExplanation: "Close! It's 'Controlled' not 'Confidential' - an important distinction in federal terminology."
   },
   {
     id: 2,
-    question: "How many practices/controls are in CMMC Level 2?",
+    question: "How many security requirements are in NIST SP 800-171 Rev 2?",
     options: [
-      "A) 110",
-      "B) 130 (110 + 20 enhancements)",
-      "C) 17",
-      "D) 42 (the answer to everything)"
+      "110 security requirements",
+      "130 security requirements",
+      "17 security requirements",
+      "320 security requirements"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "110 practices from NIST SP 800-171. You'll know them by heart... or die trying.",
-    goodExplanation: "Good thinking about enhancements, but Level 2 is specifically the 110 base controls."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "NIST 800-171 Rev 2 contains 110 security requirements across 14 control families.",
+    goodExplanation: "There are 110 base requirements. You might be thinking of 800-53 which has more."
   },
   {
     id: 3,
-    question: "What is an SSP?",
-    options: [
-      "A) System Security Plan",
-      "B) Security System Policy",
-      "C) Super Secret Protocol",
-      "D) SPRS Score Predictor"
-    ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "System Security Plan - the document that will consume your next 6 months.",
-    goodExplanation: "Close! Policies are part of it, but SSP = System Security Plan specifically."
-  },
-  {
-    id: 4,
     question: "What is the minimum SPRS score possible?",
     options: [
-      "A) -203",
-      "B) -110 (one point per control)",
-      "C) 0",
-      "D) Your self-esteem after an audit"
+      "-203",
+      "-110",
+      "0",
+      "-171"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "-203 is the minimum. If you're there, may your documentation be thorough.",
-    goodExplanation: "Good logic, but the actual math results in -203 based on weighted controls."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "-203 is the minimum SPRS score, calculated from weighted requirement values.",
+    goodExplanation: "Good logic thinking one point per control, but the actual weighted minimum is -203."
+  },
+
+  // ============ NIST 800-171 CONTROL FAMILIES ============
+  {
+    id: 4,
+    question: "How many control families are in NIST SP 800-171?",
+    options: [
+      "14 families",
+      "17 families",
+      "20 families",
+      "11 families"
+    ],
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "NIST 800-171 has 14 control families: AC, AT, AU, CM, IA, IR, MA, MP, PE, PS, RA, CA, SC, SI.",
+    goodExplanation: "There are 14 families. You might be thinking of CMMC Level 1 which has 17 practices."
   },
   {
     id: 5,
-    question: "What does FCI stand for?",
+    question: "Which control family does 'Limit system access to authorized users' belong to?",
     options: [
-      "A) Federal Contract Information",
-      "B) Federal Controlled Information",
-      "C) Firewall Configuration Index",
-      "D) Finally Certified, Incredible"
+      "Access Control (AC)",
+      "Identification and Authentication (IA)",
+      "System and Communications Protection (SC)",
+      "Personnel Security (PS)"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Federal Contract Information - the less scary cousin of CUI.",
-    goodExplanation: "Close! FCI is 'Contract' not 'Controlled' - it's less sensitive than CUI."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "AC.L2-3.1.1 - Limit system access is an Access Control requirement.",
+    goodExplanation: "IA handles identity verification, but limiting access is specifically Access Control."
   },
   {
     id: 6,
-    question: "What NIST publication does CMMC Level 2 align with?",
+    question: "What does control family 'AU' stand for in NIST 800-171?",
     options: [
-      "A) NIST SP 800-171",
-      "B) NIST SP 800-53",
-      "C) NIST SP 800-171A",
-      "D) NIST SP 800-HELP-ME"
+      "Audit and Accountability",
+      "Authentication and Authorization",
+      "Access and Usage",
+      "Awareness and Understanding"
     ],
-    bestAnswer: "A",
-    goodAnswer: "C",
-    explanation: "NIST SP 800-171. Your new bedtime reading material.",
-    goodExplanation: "800-171A is the assessment guide - good knowledge! But 800-171 defines the controls."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "AU = Audit and Accountability, covering logging, monitoring, and audit trail requirements.",
+    goodExplanation: "Authentication is actually under IA (Identification and Authentication)."
   },
+
+  // ============ SPECIFIC 800-171 REQUIREMENTS ============
   {
     id: 7,
-    question: "What is a POA&M?",
+    question: "Per 800-171, how long must audit logs be retained at minimum?",
     options: [
-      "A) Plan of Action & Milestones",
-      "B) Plan of Assessment & Metrics",
-      "C) Policy on Audits & Management",
-      "D) Pain, Anguish & Misery"
+      "Sufficient to support after-the-fact investigation (typically 90+ days)",
+      "30 days",
+      "1 year",
+      "7 days"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Plan of Action & Milestones. (D is also technically correct in practice.)",
-    goodExplanation: "Assessment and metrics are related, but it's Action & Milestones specifically."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "3.3.2 requires logs be retained long enough for investigation. Industry standard is 90+ days.",
+    goodExplanation: "1 year is good practice and often contractually required, but 800-171 specifies investigation support."
   },
   {
     id: 8,
-    question: "Who performs CMMC Level 2 assessments?",
+    question: "What encryption standard does 800-171 require for protecting CUI at rest and in transit?",
     options: [
-      "A) C3PAO (Third-Party Assessment Org)",
-      "B) DCMA (Defense Contract Management Agency)",
-      "C) Your IT guy who 'knows security'",
-      "D) A ouija board"
+      "FIPS 140-2 validated cryptography",
+      "AES-256 minimum",
+      "TLS 1.2 or higher",
+      "Any industry-standard encryption"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "C3PAO - the people who will make you question every life decision.",
-    goodExplanation: "DCMA handles DIBCAC assessments, but C3PAOs do CMMC Level 2 specifically."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "3.13.11 requires FIPS-validated cryptographic mechanisms to protect CUI.",
+    goodExplanation: "TLS 1.2+ is part of it for transit, but the requirement specifically calls for FIPS validation."
   },
   {
     id: 9,
-    question: "What is 'scoping' in CMMC?",
+    question: "What does requirement 3.5.3 mandate for authenticating users?",
     options: [
-      "A) Defining systems that process/store CUI",
-      "B) Identifying all assets touching federal data",
-      "C) Looking through a telescope at servers",
-      "D) Running away from auditors"
+      "Multi-factor authentication for network access to privileged and non-privileged accounts",
+      "Multi-factor authentication only for privileged accounts",
+      "Password complexity requirements",
+      "Biometric authentication for all users"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Proper scoping can save you from certifying your entire company.",
-    goodExplanation: "That's part of it! But scoping specifically focuses on CUI boundaries."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "3.5.3 requires MFA for network access to both privileged AND non-privileged accounts accessing CUI.",
+    goodExplanation: "MFA for privileged is critical, but 800-171 extends this to all network access to CUI."
   },
   {
     id: 10,
-    question: "What is the purpose of FIPS 140-2 validated encryption?",
+    question: "Per 3.1.12, what must organizations do regarding remote access sessions?",
     options: [
-      "A) Ensure crypto modules meet federal standards",
-      "B) Verify encryption strength is adequate",
-      "C) To make data extra crispy",
-      "D) Justify expensive hardware purchases"
+      "Monitor and control remote access sessions",
+      "Prohibit all remote access",
+      "Allow unlimited remote access with VPN",
+      "Require on-site access only"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "FIPS 140-2 validates your encryption isn't just 'password123' with extra steps.",
-    goodExplanation: "Strength matters, but FIPS specifically validates the module meets federal standards."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "3.1.12 requires monitoring and controlling remote access, not prohibiting it entirely.",
+    goodExplanation: "VPN is one control, but monitoring and control of sessions is the actual requirement."
   },
+
+  // ============ CMMC ASSESSMENT PROCESS ============
   {
     id: 11,
-    question: "What is an enclave in CMMC context?",
+    question: "Who performs CMMC Level 2 certification assessments?",
     options: [
-      "A) Segmented network boundary containing CUI",
-      "B) Isolated security zone for sensitive data",
-      "C) A secret government bunker",
-      "D) Where compliance officers cry"
+      "C3PAO (Certified Third-Party Assessment Organization)",
+      "DCMA (Defense Contract Management Agency)",
+      "The organization itself (self-assessment)",
+      "NIST directly"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "An enclave is a properly segmented environment. (D is also valid.)",
-    goodExplanation: "Good concept! But enclave specifically refers to CUI boundaries, not just any sensitive data."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "C3PAOs conduct CMMC Level 2 assessments. DCMA handles some DIBCAC assessments.",
+    goodExplanation: "DCMA does defense assessments but C3PAOs specifically handle CMMC L2 certification."
   },
   {
     id: 12,
-    question: "How often should security awareness training occur per CMMC?",
+    question: "What are the three assessment methods used in CMMC assessments per 800-171A?",
     options: [
-      "A) Annually at minimum",
-      "B) Upon hire and when threats change",
-      "C) Never, ignorance is bliss",
-      "D) Every phishing click (so, daily)"
+      "Examine, Interview, Test",
+      "Review, Validate, Certify",
+      "Audit, Inspect, Verify",
+      "Document, Demonstrate, Confirm"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Annual training minimum. D would mean continuous training for most orgs.",
-    goodExplanation: "New hire and threat-based training is good practice, but annual minimum is the requirement."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "NIST 800-171A specifies Examine (documentation), Interview (personnel), Test (mechanisms).",
+    goodExplanation: "These terms are close but the official 800-171A terms are Examine, Interview, Test."
   },
   {
     id: 13,
-    question: "What does MFA stand for?",
+    question: "How long is a CMMC Level 2 certification valid?",
     options: [
-      "A) Multi-Factor Authentication",
-      "B) Multiple Forms of Authentication",
-      "C) Mandatory Firewall Application",
-      "D) My Favorite Acronym"
+      "3 years",
+      "5 years",
+      "1 year",
+      "Indefinitely with annual affirmation"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Multi-Factor Authentication - because passwords alone aren't enough.",
-    goodExplanation: "Same concept, different wording! The official term is Multi-Factor."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 3,
+    explanation: "CMMC certifications are valid for 3 years, requiring reassessment after expiration.",
+    goodExplanation: "Annual affirmations are required, but full recertification happens every 3 years."
   },
   {
     id: 14,
-    question: "What is the CMMC Level 1 requirement for CUI?",
+    question: "What is the maximum time allowed to close POA&M items under conditional certification?",
     options: [
-      "A) Level 1 is for FCI only, not CUI",
-      "B) Level 1 covers basic CUI handling",
-      "C) Just install antivirus",
-      "D) Post a 'No Hackers' sign"
+      "180 days",
+      "365 days",
+      "90 days",
+      "30 days"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Level 1 is FCI only (17 practices). CUI requires Level 2 minimum!",
-    goodExplanation: "Tricky! Level 1 does NOT cover CUI at all - that requires Level 2."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "Conditional certification allows 180 days to remediate POA&M items.",
+    goodExplanation: "Some contracts may allow extensions, but the standard CMMC timeline is 180 days."
   },
+
+  // ============ SCOPING AND BOUNDARIES ============
   {
     id: 15,
-    question: "What is a 'NOT MET' finding?",
+    question: "What are the five asset categories for CMMC scoping?",
     options: [
-      "A) Control that fails to meet requirements",
-      "B) Control with insufficient evidence",
-      "C) An auditor you haven't met",
-      "D) A meeting that was cancelled"
+      "CUI Assets, Security Protection, Contractor Risk Managed, Specialized, Out-of-Scope",
+      "Critical, High, Medium, Low, Informational",
+      "Network, Endpoint, Cloud, Physical, Personnel",
+      "Production, Development, Test, Backup, Archive"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "A NOT MET means you failed a control. Both A and B lead to this result.",
-    goodExplanation: "Insufficient evidence often results in NOT MET, but it specifically means the control wasn't satisfied."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "CMMC scoping uses: CUI Assets, Security Protection Assets, Contractor Risk Managed, Specialized, Out-of-Scope.",
+    goodExplanation: "Those are valid asset types but not the official CMMC scoping categories."
   },
   {
     id: 16,
-    question: "What system holds your SPRS score?",
+    question: "What defines the boundary of a CMMC assessment?",
     options: [
-      "A) Supplier Performance Risk System",
-      "B) SPRS Portal (sam.gov integration)",
-      "C) The Cloud",
-      "D) A filing cabinet in the Pentagon"
+      "Systems that process, store, or transmit CUI",
+      "The entire corporate network",
+      "Only servers containing CUI",
+      "All IT assets owned by the organization"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "SPRS - Supplier Performance Risk System. Your score lives there.",
-    goodExplanation: "It does integrate with SAM.gov! But SPRS itself is the Supplier Performance Risk System."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "The assessment boundary includes all systems that process, store, OR transmit CUI.",
+    goodExplanation: "Servers are part of it, but workstations and network paths that transmit CUI are also in scope."
   },
+
+  // ============ INCIDENT RESPONSE ============
   {
     id: 17,
-    question: "What is 'evidence' in a CMMC assessment?",
+    question: "Per DFARS 252.204-7012, how quickly must cyber incidents be reported to DoD?",
     options: [
-      "A) Documentation proving control implementation",
-      "B) Artifacts demonstrating security practices",
-      "C) Screenshots of you doing work",
-      "D) Witness testimonies under oath"
+      "Within 72 hours of discovery",
+      "Within 24 hours of discovery",
+      "Within 1 hour of discovery",
+      "Within 30 days of discovery"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Evidence = proof your controls work. Screenshots, policies, logs - all of it.",
-    goodExplanation: "Artifacts are evidence! The key is they must prove the control is implemented."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "DFARS 7012 requires reporting cyber incidents to DoD within 72 hours via dibnet.dod.mil.",
+    goodExplanation: "24 hours is best practice and some contracts require it, but DFARS specifies 72 hours."
   },
   {
     id: 18,
-    question: "How long must you retain security logs per NIST 800-171?",
+    question: "What must be preserved for 90 days following a cyber incident per DFARS?",
     options: [
-      "A) 90 days minimum",
-      "B) 1 year recommended",
-      "C) 30 days",
-      "D) Until heat death of universe"
+      "Media and malicious software for forensic analysis",
+      "Only email communications",
+      "Financial records",
+      "Employee attendance records"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "90 days minimum retention. Your SIEM storage costs just increased.",
-    goodExplanation: "1 year is best practice and often required by contracts, but 800-171 says 90 days minimum."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "DFARS 7012 requires preserving images of affected systems and malware for 90 days.",
+    goodExplanation: "Communications may be relevant but the specific requirement is media and malware preservation."
   },
+
+  // ============ TECHNICAL CONTROLS ============
   {
     id: 19,
-    question: "What does NIST 800-171A provide?",
+    question: "What does requirement 3.13.1 mandate for system boundaries?",
     options: [
-      "A) Assessment procedures for controls",
-      "B) Detailed control implementation guidance",
-      "C) More acronyms",
-      "D) Job security for consultants"
+      "Monitor, control, and protect communications at external boundaries and key internal boundaries",
+      "Encrypt all internal communications",
+      "Block all inbound traffic",
+      "Segment every department individually"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "800-171A tells you HOW you'll be assessed. Know it. Fear it.",
-    goodExplanation: "It helps with implementation too, but it's specifically the assessment procedures document."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 3,
+    explanation: "3.13.1 requires monitoring and protecting communications at system boundaries.",
+    goodExplanation: "Segmentation is related but the requirement focuses on monitoring and control at boundaries."
   },
   {
     id: 20,
-    question: "What should you do if you discover a CUI breach?",
+    question: "Per 3.4.1, what must organizations establish and maintain?",
     options: [
-      "A) Report to DoD within 72 hours",
-      "B) Report to CISA within 24 hours",
-      "C) Delete evidence and hope",
-      "D) Update LinkedIn to 'Open to Work'"
+      "Baseline configurations and inventories of organizational systems",
+      "A change management committee",
+      "Weekly vulnerability scans",
+      "Annual penetration tests"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Report to DoD within 72 hours via dibnet.dod.mil. (D is the mood though.)",
-    goodExplanation: "CISA reporting is for critical infrastructure - DoD breach reporting is via DIBNET within 72 hours."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "3.4.1 requires baseline configurations and system inventories as foundational CM controls.",
+    goodExplanation: "Vulnerability scanning is important but 3.4.1 specifically addresses baselines and inventory."
   },
-  // === PHASE 1: PLANNING & PREPARATION ===
   {
     id: 21,
-    question: "What is Phase 1 of the CMMC assessment process?",
+    question: "What does requirement 3.14.1 require for malicious code protection?",
     options: [
-      "A) Planning & Preparation",
-      "B) Pre-Assessment Readiness",
-      "C) Assessment Execution",
-      "D) Crying in the break room"
+      "Identify, report, and correct system flaws in a timely manner",
+      "Install antivirus on all systems",
+      "Block all executable files",
+      "Scan email attachments only"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Phase 1 is Planning & Preparation - defining scope, reviewing readiness, and scheduling.",
-    goodExplanation: "Readiness is part of it! But the official phase name is Planning & Preparation."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "3.14.1 focuses on flaw identification and remediation. 3.14.2 covers malicious code protection.",
+    goodExplanation: "Antivirus is part of malicious code protection (3.14.2), but 3.14.1 is about flaw remediation."
   },
+
+  // ============ PERSONNEL AND AWARENESS ============
   {
     id: 22,
-    question: "During Phase 1, who must affirm the accuracy of the SPRS score?",
+    question: "Per 3.2.1, what security awareness content must be provided to users?",
     options: [
-      "A) A senior company official",
-      "B) The CISO or security lead",
-      "C) The IT intern",
-      "D) Anyone with a pulse"
+      "Awareness of security risks and applicable policies",
+      "Only phishing awareness",
+      "Certification exam preparation",
+      "Technical hacking techniques"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "A senior official must affirm the SPRS score accuracy - it's a legal attestation!",
-    goodExplanation: "The CISO might do it, but it must be a senior official with authority to attest."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "3.2.1 requires awareness of security risks associated with their activities and applicable policies.",
+    goodExplanation: "Phishing is one risk, but the requirement covers broader security risks and policies."
   },
   {
     id: 23,
-    question: "What document defines the assessment boundary in Phase 1?",
+    question: "What does 3.9.2 require before granting access to CUI?",
     options: [
-      "A) The scoping guide/asset inventory",
-      "B) The System Security Plan (SSP)",
-      "C) A post-it note",
-      "D) The network diagram nobody updated"
+      "Screen individuals prior to authorizing access to systems containing CUI",
+      "Require a security clearance",
+      "Complete a 40-hour training course",
+      "Sign a non-disclosure agreement only"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "The scoping guide helps define which assets are in-scope for CUI processing.",
-    goodExplanation: "The SSP does describe boundaries! But the scoping guide/inventory specifically defines assessment scope."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 3,
+    explanation: "3.9.2 requires personnel screening before granting CUI access. NDAs are part but not the full requirement.",
+    goodExplanation: "NDAs are important but screening includes background checks appropriate to the risk."
   },
+
+  // ============ PHYSICAL SECURITY ============
   {
     id: 24,
-    question: "What are the 5 asset categories for CMMC scoping?",
+    question: "What does requirement 3.10.1 address?",
     options: [
-      "A) CUI, Security Protection, Contractor Risk Managed, Specialized, Out-of-Scope",
-      "B) Critical, High, Medium, Low, Informational",
-      "C) Red, Blue, Green, Yellow, Purple",
-      "D) Servers, Laptops, Phones, Printers, Feelings"
+      "Limit physical access to organizational systems and equipment to authorized individuals",
+      "Install surveillance cameras everywhere",
+      "Require biometric access for all doors",
+      "Hire security guards"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "CUI Assets, Security Protection Assets, Contractor Risk Managed, Specialized, and Out-of-Scope.",
-    goodExplanation: "That's a risk classification! CMMC uses specific asset categories for scoping."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "3.10.1 requires limiting physical access to systems, equipment, and operating environments.",
+    goodExplanation: "Biometrics could implement this, but the requirement is about limiting access to authorized individuals."
   },
   {
     id: 25,
-    question: "How far in advance should you schedule your C3PAO assessment?",
+    question: "Per 3.10.6, what alternative protection must be used for areas that cannot be protected physically?",
     options: [
-      "A) 3-6 months typically",
-      "B) 6-12 months for complex environments",
-      "C) The night before",
-      "D) Never, live in denial forever"
+      "Alternative physical safeguards appropriate to the risk",
+      "Encryption only",
+      "Remove all CUI from the area",
+      "Continuous video surveillance"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Plan 3-6 months ahead - C3PAOs book up fast and you need prep time!",
-    goodExplanation: "For complex environments, more time is wise! 3-6 months is the typical guidance."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "3.10.6 requires alternative safeguards when traditional physical protection isn't feasible.",
+    goodExplanation: "Removing CUI is one option, but the requirement allows for alternative appropriate safeguards."
   },
-  // === PHASE 2: ASSESSMENT EXECUTION ===
+
+  // ============ SYSTEM MAINTENANCE ============
   {
     id: 26,
-    question: "What is Phase 2 of the CMMC assessment?",
+    question: "What does requirement 3.7.1 require for system maintenance?",
     options: [
-      "A) Assessment Execution",
-      "B) Evidence Collection & Testing",
-      "C) Planning & Preparation",
-      "D) The denial phase"
+      "Perform maintenance on organizational systems in a timely manner",
+      "Contract all maintenance to third parties",
+      "Perform maintenance only during business hours",
+      "Document maintenance only when systems fail"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Phase 2 is Assessment Execution - where the C3PAO actually tests your controls.",
-    goodExplanation: "Evidence collection and testing happen during Assessment Execution - that's the official name."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "3.7.1 requires timely maintenance. Third-party maintenance requires additional controls (3.7.3).",
+    goodExplanation: "Third parties can do maintenance but there are specific controls for non-local maintenance."
   },
   {
     id: 27,
-    question: "What are the three assessment methods used in Phase 2?",
+    question: "What must be done before media containing CUI is released for maintenance?",
     options: [
-      "A) Examine, Interview, Test",
-      "B) Review, Validate, Verify",
-      "C) Hope, Pray, Cry",
-      "D) Google, Stack Overflow, ChatGPT"
+      "Sanitize or destroy the media",
+      "Encrypt the media only",
+      "Label the media as classified",
+      "Notify the DoD"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Examine (review docs), Interview (talk to staff), Test (verify controls work).",
-    goodExplanation: "Similar concepts! But the official NIST terms are Examine, Interview, and Test."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "3.8.3 requires sanitization before release. Encryption alone may not be sufficient.",
+    goodExplanation: "Encryption helps protect but sanitization ensures CUI cannot be recovered."
   },
+
+  // ============ RISK ASSESSMENT ============
   {
     id: 28,
-    question: "During interviews, who should be available to the assessors?",
+    question: "How often must organizations assess risk to operations and assets per 3.11.1?",
     options: [
-      "A) Personnel responsible for implementing controls",
-      "B) Anyone with knowledge of security operations",
-      "C) Only the CISO",
-      "D) Literally anyone who can fog a mirror"
+      "Periodically, as defined by the organization based on risk",
+      "Annually only",
+      "Monthly",
+      "Only when incidents occur"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "People who actually implement and operate the controls must be available.",
-    goodExplanation: "Security ops knowledge helps, but specifically those responsible for the controls being assessed."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "3.11.1 requires periodic risk assessment. The frequency should be risk-based and documented.",
+    goodExplanation: "Annual is common but the requirement is 'periodic' based on organizational risk factors."
   },
   {
     id: 29,
-    question: "What happens if evidence is missing during Phase 2?",
+    question: "What must vulnerability scans identify per 3.11.2?",
     options: [
-      "A) The control may be marked NOT MET",
-      "B) You get a chance to provide it later",
-      "C) Everyone gets a participation trophy",
-      "D) The audit magically passes anyway"
+      "Vulnerabilities in organizational systems and applications",
+      "Only external-facing vulnerabilities",
+      "Hardware inventory only",
+      "Employee password strength"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "No evidence = NOT MET. Document everything or suffer the consequences!",
-    goodExplanation: "Limited real-time remediation exists, but missing evidence typically means NOT MET."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "3.11.2 requires scanning organizational systems and applications for vulnerabilities.",
+    goodExplanation: "External-facing systems are critical but internal scanning is also required."
   },
+
+  // ============ MEDIA PROTECTION ============
   {
     id: 30,
-    question: "Can you remediate findings during the assessment?",
+    question: "What type of marking does 3.8.4 require on media containing CUI?",
     options: [
-      "A) Yes, limited real-time remediation is allowed",
-      "B) Yes, but only for documentation gaps",
-      "C) No, what's done is done",
-      "D) Only on Tuesdays"
+      "CUI markings required by CUI Registry and organization policy",
+      "TOP SECRET markings",
+      "Company logo only",
+      "No markings to prevent identification"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Limited real-time remediation is allowed for minor issues during assessment.",
-    goodExplanation: "Documentation is common, but real-time remediation can apply to minor technical fixes too."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "3.8.4 requires marking media with required CUI designations per the CUI Registry.",
+    goodExplanation: "Company identification helps but specific CUI markings are the requirement."
   },
-  // === PHASE 3: REPORTING ===
+
+  // ============ ADVANCED TECHNICAL QUESTIONS ============
   {
     id: 31,
-    question: "What is Phase 3 of the CMMC assessment?",
+    question: "What does requirement 3.1.5 address regarding privileged accounts?",
     options: [
-      "A) Reporting",
-      "B) Findings Documentation",
-      "C) Celebration",
-      "D) The bargaining phase"
+      "Employ the principle of least privilege, including specific security functions and privileged accounts",
+      "Grant all employees administrator access",
+      "Disable all privileged accounts",
+      "Rotate privileged accounts daily"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Phase 3 is Reporting - documenting findings and creating the assessment report.",
-    goodExplanation: "Findings documentation is what happens in Reporting - that's the official phase name."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 3,
+    explanation: "3.1.5 requires least privilege - users get minimum access necessary for their duties.",
+    goodExplanation: "Rotation is good for credentials but least privilege is about access scope."
   },
   {
     id: 32,
-    question: "What document lists all findings requiring remediation?",
+    question: "Per 3.1.7, what must be prevented regarding privileged functions?",
     options: [
-      "A) Plan of Action & Milestones (POA&M)",
-      "B) Corrective Action Plan (CAP)",
-      "C) The shame spreadsheet",
-      "D) A very long sticky note"
+      "Prevent non-privileged users from executing privileged functions",
+      "Prevent all users from using command line",
+      "Prevent remote privileged access entirely",
+      "Prevent privileged users from accessing CUI"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "The POA&M documents all NOT MET findings and remediation timelines.",
-    goodExplanation: "CAP is similar terminology used elsewhere, but CMMC specifically uses POA&M."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "3.1.7 ensures only authorized users can execute privileged functions.",
+    goodExplanation: "Remote privileged access has controls (3.1.12) but 3.1.7 is about function separation."
   },
   {
     id: 33,
-    question: "How long do you have to close POA&M items for conditional certification?",
+    question: "What does 3.5.10 require for stored passwords?",
     options: [
-      "A) 180 days",
-      "B) 1 year",
-      "C) Forever, no rush",
-      "D) It's already too late"
+      "Store and transmit only cryptographically-protected passwords",
+      "Store passwords in plain text with access controls",
+      "Never store passwords",
+      "Use reversible encryption for passwords"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "180 days to close POA&M items or your conditional certification may be revoked.",
-    goodExplanation: "Some contracts may allow longer, but the CMMC standard is 180 days."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "3.5.10 requires cryptographic protection (hashing) for stored passwords.",
+    goodExplanation: "Not storing passwords sounds secure but authentication requires some credential storage."
   },
   {
     id: 34,
-    question: "What determines a MET vs NOT MET finding?",
+    question: "What network architecture does 3.13.5 recommend for CUI systems?",
     options: [
-      "A) Whether assessment objectives are satisfied per 800-171A",
-      "B) If the control is implemented and effective",
-      "C) Assessor's mood that day",
-      "D) How good the coffee was"
+      "Implement subnetworks for publicly accessible system components that are separated from internal networks",
+      "Place all systems on a single flat network",
+      "Use only cloud hosting",
+      "Require air-gapped networks for all CUI"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Assessment objectives from NIST 800-171A determine MET/NOT MET status.",
-    goodExplanation: "Implementation and effectiveness matter, but 800-171A objectives are the specific criteria."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 3,
+    explanation: "3.13.5 requires network segmentation with DMZs for public-facing components.",
+    goodExplanation: "Air-gapping is extreme. The requirement is logical separation via subnetworks."
   },
   {
     id: 35,
-    question: "Who reviews the assessment report before submission?",
+    question: "What does 3.12.4 require for system security plans?",
     options: [
-      "A) The OSC (Organization Seeking Certification)",
-      "B) The organization's legal/compliance team",
-      "C) Nobody, YOLO",
-      "D) A magic 8-ball"
+      "Develop, document, update, and implement plans describing system boundaries, environments, and security requirements",
+      "Use a template without customization",
+      "Create plans only for production systems",
+      "Review plans every 5 years"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "The OSC reviews the report for accuracy before the C3PAO submits to Cyber AB.",
-    goodExplanation: "Legal/compliance typically helps, but the OSC as an entity must review and approve."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "3.12.4 requires comprehensive SSPs covering boundaries, environment, and implementation.",
+    goodExplanation: "Production is critical but plans should cover all in-scope systems."
   },
-  // === PHASE 4: ADJUDICATION & CERTIFICATION ===
+
+  // ============ CMMC SPECIFIC QUESTIONS ============
   {
     id: 36,
-    question: "What is Phase 4 of the CMMC assessment?",
+    question: "What distinguishes CMMC Level 1 from Level 2?",
     options: [
-      "A) Adjudication & Certification",
-      "B) Final Review & Approval",
-      "C) Victory lap",
-      "D) The acceptance phase"
+      "Level 1 covers FCI (17 practices), Level 2 covers CUI (110 requirements)",
+      "Level 1 is self-assessed, Level 2 is always third-party",
+      "Level 1 requires encryption, Level 2 does not",
+      "Level 1 is for large companies, Level 2 for small"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Phase 4 is Adjudication - where Cyber AB reviews and issues certification decisions.",
-    goodExplanation: "Final review and approval describes what happens, but the official name is Adjudication."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "Level 1 protects FCI with 17 practices. Level 2 protects CUI with all 110 NIST 800-171 requirements.",
+    goodExplanation: "Assessment type varies by contract, but the key difference is FCI vs CUI protection scope."
   },
   {
     id: 37,
-    question: "What are the two types of CMMC certification?",
+    question: "What is required for an 'Affirmation' in CMMC?",
     options: [
-      "A) Conditional and Final",
-      "B) Provisional and Full",
-      "C) Temporary and Permanent",
-      "D) Real and Imaginary"
+      "A senior official affirming continued compliance annually in SPRS",
+      "A signed contract with the DoD",
+      "A physical inspection of facilities",
+      "A letter from the C3PAO"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Conditional (with POA&M items) or Final (all controls MET).",
-    goodExplanation: "Similar concept! But CMMC uses the terms Conditional and Final specifically."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 3,
+    explanation: "Annual affirmation by a senior official in SPRS confirms continued compliance.",
+    goodExplanation: "C3PAOs conduct assessments but affirmation is the organization's responsibility."
   },
   {
     id: 38,
-    question: "How long is a CMMC certification valid?",
+    question: "What is a Security Protection Asset (SPA) in CMMC scoping?",
     options: [
-      "A) 3 years",
-      "B) 5 years with annual affirmations",
-      "C) Forever",
-      "D) Until the next breach"
+      "An asset that provides security functions for CUI assets but doesn't process CUI",
+      "Any asset that contains CUI",
+      "Assets that are out of scope",
+      "Cloud-only assets"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "CMMC certifications are valid for 3 years, then you get to do it all again!",
-    goodExplanation: "Annual affirmations are required, but the cert itself is valid for 3 years."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "SPAs provide security functions (firewalls, SIEM, etc.) for CUI but don't process CUI themselves.",
+    goodExplanation: "Assets containing CUI are 'CUI Assets' - a different category than SPAs."
   },
   {
     id: 39,
-    question: "What happens if POA&M items aren't closed in 180 days?",
+    question: "What does 'Contractor Risk Managed Assets' mean in CMMC?",
     options: [
-      "A) Conditional certification may be revoked",
-      "B) You must request an extension",
-      "C) Nothing, extensions are automatic",
-      "D) Free pizza party"
+      "Assets that can access but not process/store CUI, managed via policy controls",
+      "Assets owned by contractors",
+      "Assets with identified vulnerabilities",
+      "Assets pending decommission"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "Failure to close POA&M items can result in revocation of conditional certification.",
-    goodExplanation: "Extensions may be possible, but the default consequence is potential revocation."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "CRM assets can access CUI environment but don't process/store CUI - managed by contractor policy.",
+    goodExplanation: "Contractor ownership doesn't define this category - it's about CUI access scope."
   },
   {
     id: 40,
-    question: "Who issues the final CMMC certification?",
+    question: "What is the role of the Cyber AB (formerly CMMC-AB)?",
     options: [
-      "A) The Cyber AB (formerly CMMC-AB)",
-      "B) The C3PAO after DoD approval",
-      "C) Your mom (she's very proud)",
-      "D) The DoD CIO directly"
+      "Accredit C3PAOs and oversee the CMMC ecosystem",
+      "Conduct all CMMC assessments directly",
+      "Write the NIST 800-171 standard",
+      "Provide free compliance tools"
     ],
-    bestAnswer: "A",
-    goodAnswer: "B",
-    explanation: "The Cyber AB (Accreditation Body) issues certifications after reviewing C3PAO reports.",
-    goodExplanation: "C3PAOs conduct the assessment, but Cyber AB issues the actual certification."
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "Cyber AB accredits C3PAOs and certified assessors, overseeing the CMMC program.",
+    goodExplanation: "Cyber AB oversees but doesn't conduct assessments - C3PAOs do that."
+  },
+
+  // ============ CHALLENGING TECHNICAL QUESTIONS ============
+  {
+    id: 41,
+    question: "Per 3.3.1, what events must be logged at minimum?",
+    options: [
+      "Events that affect the audit function and successful/unsuccessful logon attempts",
+      "All user keystrokes",
+      "Only failed login attempts",
+      "Only administrator actions"
+    ],
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "3.3.1 specifies logging events affecting audit capability and logon attempts (both successful and failed).",
+    goodExplanation: "Failed logins are important but successful logins must also be logged per the requirement."
+  },
+  {
+    id: 42,
+    question: "What does requirement 3.6.1 require for incident handling?",
+    options: [
+      "Establish an operational incident-handling capability including preparation, detection, analysis, containment, recovery, and user response",
+      "Only document incidents after they occur",
+      "Outsource all incident response",
+      "Report incidents to local law enforcement first"
+    ],
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "3.6.1 requires a full incident handling capability covering the entire incident lifecycle.",
+    goodExplanation: "Outsourcing can support IR but you still need an established capability."
+  },
+  {
+    id: 43,
+    question: "What does 3.4.6 require for software installation?",
+    options: [
+      "Employ allowlisting of authorized software",
+      "Allow users to install any software needed",
+      "Block all software installation",
+      "Require manager approval via email"
+    ],
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "3.4.6 requires defining and enforcing authorized software policies (allowlisting).",
+    goodExplanation: "Blocking all installation is too restrictive. Allowlisting defines what CAN be installed."
+  },
+  {
+    id: 44,
+    question: "What synchronization does 3.3.7 require?",
+    options: [
+      "Internal system clocks with an authoritative time source",
+      "Backup schedules across systems",
+      "User passwords across systems",
+      "Software versions across systems"
+    ],
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "3.3.7 requires time synchronization for accurate audit log correlation and forensics.",
+    goodExplanation: "Backup synchronization is important but 3.3.7 specifically addresses time sources."
+  },
+  {
+    id: 45,
+    question: "What does 3.13.16 require for CUI at rest?",
+    options: [
+      "Protect the confidentiality of CUI at rest using cryptographic mechanisms",
+      "Store CUI only in locked filing cabinets",
+      "Never store CUI - process only in memory",
+      "Compress CUI for storage"
+    ],
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "3.13.16 requires cryptographic protection for CUI at rest (full disk encryption, database encryption, etc.).",
+    goodExplanation: "Memory-only processing isn't practical. Encryption protects stored CUI."
+  },
+
+  // ============ FLOW-DOWN AND SUPPLY CHAIN ============
+  {
+    id: 46,
+    question: "What must prime contractors do regarding CMMC requirements for subcontractors?",
+    options: [
+      "Flow down applicable security requirements based on CUI/FCI handled by subcontractors",
+      "Assume all subcontractors are compliant",
+      "Only notify subcontractors after winning the contract",
+      "Require all subcontractors to achieve Level 3"
+    ],
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 3,
+    explanation: "Flow-down requires primes to ensure subs meet appropriate CMMC levels for the CUI they handle.",
+    goodExplanation: "Level requirements depend on what data subs handle - not all need the same level."
+  },
+  {
+    id: 47,
+    question: "What does 3.1.20 require for external system connections?",
+    options: [
+      "Verify and control/limit connections to external systems",
+      "Block all external connections",
+      "Allow any connection with a VPN",
+      "Only connect to government systems"
+    ],
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "3.1.20 requires verification and control of external system connections - not prohibition.",
+    goodExplanation: "VPN provides secure transit but the requirement is about verifying and controlling connections."
+  },
+
+  // ============ ASSESSMENT AND EVIDENCE ============
+  {
+    id: 48,
+    question: "What constitutes acceptable evidence for 'Examine' assessment objectives?",
+    options: [
+      "Policies, procedures, plans, system security documentation, and configuration settings",
+      "Only verbal explanations from staff",
+      "Marketing materials about security",
+      "Vendor certifications alone"
+    ],
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 3,
+    explanation: "Examine objectives require documented evidence: policies, procedures, configurations, etc.",
+    goodExplanation: "Vendor certs support but don't replace your own documented implementation evidence."
+  },
+  {
+    id: 49,
+    question: "What determines a 'MET' vs 'NOT MET' finding in assessment?",
+    options: [
+      "Whether all assessment objectives for a requirement are satisfied",
+      "Assessor's professional judgment alone",
+      "Whether you have a policy document",
+      "The percentage of controls implemented"
+    ],
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 2,
+    explanation: "MET requires satisfying ALL assessment objectives per 800-171A for that requirement.",
+    goodExplanation: "Policies are part of it but all objectives (examine, interview, test) must be satisfied."
+  },
+  {
+    id: 50,
+    question: "How many assessment objectives does 800-171A define for the 110 requirements?",
+    options: [
+      "320 objectives across all requirements",
+      "Exactly 110 (one per requirement)",
+      "220 (two per requirement)",
+      "500+ objectives"
+    ],
+    bestAnswerIndex: 0,
+    goodAnswerIndex: 1,
+    explanation: "800-171A defines 320 assessment objectives across the 110 requirements (varying per requirement).",
+    goodExplanation: "Some requirements have multiple objectives; it's not a 1:1 mapping."
   },
 ];
 

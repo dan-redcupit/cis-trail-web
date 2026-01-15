@@ -1,4 +1,4 @@
-import { Question, GameEvent, CMMC_QUESTIONS, RANDOM_EVENTS, DEATH_MESSAGES, DEFAULT_PARTY } from './gameData';
+import { Question, ShuffledQuestion, GameEvent, CMMC_QUESTIONS, RANDOM_EVENTS, DEATH_MESSAGES, DEFAULT_PARTY, getShuffledQuestion } from './gameData';
 
 export type Screen =
   | 'title'
@@ -33,7 +33,7 @@ export interface GameState {
   questionsAnswered: number;
   correctAnswers: number;
   usedQuestions: number[];
-  currentQuestion: Question | null;
+  currentQuestion: ShuffledQuestion | null;
   currentEvent: GameEvent | null;
   lastAnswer: {
     quality: 'best' | 'good' | 'wrong';
@@ -102,13 +102,17 @@ export function getInitialState(): GameState {
   };
 }
 
-function getRandomQuestion(state: GameState): Question {
+function getRandomQuestion(state: GameState): ShuffledQuestion {
   const available = CMMC_QUESTIONS.filter(q => !state.usedQuestions.includes(q.id));
+  let question: Question;
   if (available.length === 0) {
     // Reset used questions if all have been used
-    return CMMC_QUESTIONS[Math.floor(Math.random() * CMMC_QUESTIONS.length)];
+    question = CMMC_QUESTIONS[Math.floor(Math.random() * CMMC_QUESTIONS.length)];
+  } else {
+    question = available[Math.floor(Math.random() * available.length)];
   }
-  return available[Math.floor(Math.random() * available.length)];
+  // Shuffle the answer options so correct answer isn't always in the same position
+  return getShuffledQuestion(question);
 }
 
 function getRandomEvent(): GameEvent {
@@ -227,30 +231,30 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
 
       if (isBest) {
-        // BEST answer: Full rewards
+        // BEST answer: Full rewards (100 miles = minimum 20 questions to complete)
         newState = {
           ...newState,
           correctAnswers: state.correctAnswers + 1,
-          milesTraveled: Math.min(state.totalMiles, state.milesTraveled + 200),
-          morale: Math.min(100, state.morale + 15),
-          sprsScore: Math.min(110, state.sprsScore + 7),
+          milesTraveled: Math.min(state.totalMiles, state.milesTraveled + 100),
+          morale: Math.min(100, state.morale + 10),
+          sprsScore: Math.min(110, state.sprsScore + 5),
         };
       } else if (isGood) {
         // GOOD answer: Partial credit, still counts as correct
         newState = {
           ...newState,
           correctAnswers: state.correctAnswers + 1,
-          milesTraveled: Math.min(state.totalMiles, state.milesTraveled + 100),
+          milesTraveled: Math.min(state.totalMiles, state.milesTraveled + 75),
           morale: Math.min(100, state.morale + 5),
-          sprsScore: Math.min(110, state.sprsScore + 3),
+          sprsScore: Math.min(110, state.sprsScore + 2),
         };
       } else {
         // WRONG answer: Penalties
         newState = {
           ...newState,
           milesTraveled: state.milesTraveled + 25,
-          morale: Math.max(0, state.morale - 20),
-          sprsScore: Math.max(-203, state.sprsScore - 10),
+          morale: Math.max(0, state.morale - 15),
+          sprsScore: Math.max(-203, state.sprsScore - 8),
         };
 
         // 50% chance of death on wrong answer

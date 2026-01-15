@@ -1,9 +1,9 @@
 'use client';
 
-import { Question } from '@/lib/gameData';
+import { ShuffledQuestion } from '@/lib/gameData';
 
 interface QuestionScreenProps {
-  question: Question;
+  question: ShuffledQuestion;
   onAnswer: (answer: string) => void;
 }
 
