@@ -23,6 +23,8 @@ export interface PartyMember {
   alive: boolean;
 }
 
+export type Difficulty = 'easy' | 'normal' | 'hard' | 'nightmare';
+
 export interface GameState {
   screen: Screen;
   party: PartyMember[];
@@ -45,6 +47,12 @@ export interface GameState {
   huntingResult: { findings: number; severity: 'critical' | 'moderate' | 'low' } | null;
   gameOverReason: string;
   animationFrame: number;
+  // New fields
+  godMode: boolean;
+  difficulty: Difficulty;
+  deathShield: boolean;  // Prevents next random death (from Supply Store)
+  totalDeaths: number;   // Track for achievements
+  consecutiveCorrect: number;  // Track for perfect audit achievement
 }
 
 export type GameAction =
@@ -79,7 +87,10 @@ export type GameAction =
   | { type: 'WAIT_FOR_FERRY' }
   | { type: 'CAULK_AND_FLOAT' }
   | { type: 'VALLEY_OF_DESPAIR' }
-  | { type: 'CONVINCE_LEADERSHIP'; success: boolean };
+  | { type: 'CONVINCE_LEADERSHIP'; success: boolean }
+  | { type: 'TOGGLE_GOD_MODE' }
+  | { type: 'SET_DIFFICULTY'; difficulty: Difficulty }
+  | { type: 'SET_PARTY_WITH_BONUS'; party: string[]; sprsBonus: number };
 
 export function getInitialState(): GameState {
   return {
@@ -99,6 +110,12 @@ export function getInitialState(): GameState {
     huntingResult: null,
     gameOverReason: '',
     animationFrame: 0,
+    // New fields
+    godMode: false,
+    difficulty: 'normal',
+    deathShield: false,
+    totalDeaths: 0,
+    consecutiveCorrect: 0,
   };
 }
 
@@ -559,6 +576,23 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           animationFrame: state.animationFrame + 1
         };
       }
+    }
+
+    // === EASTER EGGS & SETTINGS ===
+    case 'TOGGLE_GOD_MODE':
+      return { ...state, godMode: !state.godMode };
+
+    case 'SET_DIFFICULTY':
+      return { ...state, difficulty: action.difficulty };
+
+    case 'SET_PARTY_WITH_BONUS': {
+      const party = action.party.map(name => ({ name, alive: true }));
+      return {
+        ...state,
+        party,
+        sprsScore: Math.min(110, Math.max(-203, state.sprsScore + action.sprsBonus)),
+        screen: 'trail'
+      };
     }
 
     default:

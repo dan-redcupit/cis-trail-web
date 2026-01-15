@@ -288,3 +288,189 @@ export function playJetEngine() {
     osc2.stop(ctx.currentTime + 0.5);
   } catch (e) {}
 }
+
+// === NEW SOUND EFFECTS ===
+
+// Audit alarm - klaxon for compliance checkpoints
+export function playAuditAlarm() {
+  try {
+    const ctx = getAudioContext();
+    // Two-tone klaxon alternating
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => {
+        playTone(i % 2 === 0 ? 600 : 400, 0.15, 'square', 0.25);
+      }, i * 150);
+    }
+  } catch (e) {}
+}
+
+// Keyboard clacking - typing during vulnerability hunting
+export function playKeyboardClack() {
+  try {
+    for (let i = 0; i < 6; i++) {
+      setTimeout(() => {
+        const freq = 1800 + Math.random() * 400;
+        playTone(freq, 0.03, 'square', 0.15);
+      }, i * 80 + Math.random() * 40);
+    }
+  } catch (e) {}
+}
+
+// Cash register - cha-ching when SPRS increases
+export function playCashRegister() {
+  try {
+    // Bell ding
+    playTone(1200, 0.1, 'sine', 0.3);
+    setTimeout(() => playTone(1500, 0.1, 'sine', 0.25), 100);
+    setTimeout(() => playTone(1800, 0.15, 'sine', 0.2), 200);
+    // Drawer slide
+    setTimeout(() => {
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => playTone(200 + i * 50, 0.05, 'triangle', 0.15), i * 30);
+      }
+    }, 300);
+  } catch (e) {}
+}
+
+// Sad trombone - wah wah waaaah on wrong answers
+export function playSadTrombone() {
+  playSequence([
+    { freq: 311, dur: 0.25 },  // Eb
+    { freq: 293, dur: 0.25 },  // D
+    { freq: 277, dur: 0.25 },  // C#
+    { freq: 261, dur: 0.6 },   // C (long, sad)
+  ], 'triangle');
+}
+
+// Dialup modem - retro internet connection sound
+export function playDialup() {
+  try {
+    const ctx = getAudioContext();
+    // Initial dial tones
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => {
+        playTone(350 + Math.random() * 200, 0.08, 'sine', 0.2);
+      }, i * 100);
+    }
+    // Handshake screech
+    setTimeout(() => {
+      for (let i = 0; i < 10; i++) {
+        setTimeout(() => {
+          const freq = 1000 + Math.random() * 1500;
+          playTone(freq, 0.05, 'square', 0.12);
+        }, i * 60);
+      }
+    }, 500);
+    // Connection established beeps
+    setTimeout(() => {
+      playTone(1200, 0.1, 'sine', 0.15);
+      setTimeout(() => playTone(1400, 0.1, 'sine', 0.15), 150);
+    }, 1200);
+  } catch (e) {}
+}
+
+// Coffee slurp - when resting
+export function playCoffeeSlurp() {
+  try {
+    const ctx = getAudioContext();
+    // Slurp is a descending noise burst
+    const duration = 0.3;
+    const bufferSize = ctx.sampleRate * duration;
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+
+    for (let i = 0; i < bufferSize; i++) {
+      // Modulated noise that descends in intensity
+      const envelope = 1 - (i / bufferSize);
+      output[i] = (Math.random() * 2 - 1) * envelope * 0.5;
+    }
+
+    const noiseSource = ctx.createBufferSource();
+    noiseSource.buffer = noiseBuffer;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 400;
+    filter.Q.value = 2;
+
+    const gainNode = ctx.createGain();
+    gainNode.gain.setValueAtTime(0.25, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+
+    noiseSource.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(ctx.destination);
+
+    noiseSource.start(ctx.currentTime);
+  } catch (e) {}
+}
+
+// Paper shredder sound
+export function playShredder() {
+  try {
+    const ctx = getAudioContext();
+    const duration = 0.6;
+    const bufferSize = ctx.sampleRate * duration;
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+
+    // Grinding noise pattern
+    for (let i = 0; i < bufferSize; i++) {
+      const modulation = Math.sin(i / (ctx.sampleRate / 100)) > 0 ? 1 : 0.6;
+      output[i] = (Math.random() * 2 - 1) * modulation;
+    }
+
+    const noiseSource = ctx.createBufferSource();
+    noiseSource.buffer = noiseBuffer;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 600;
+
+    const gainNode = ctx.createGain();
+    gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+
+    noiseSource.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(ctx.destination);
+
+    noiseSource.start(ctx.currentTime);
+  } catch (e) {}
+}
+
+// Windows error sound - classic error beep
+export function playWindowsError() {
+  try {
+    // Classic two-tone error
+    playTone(523, 0.15, 'square', 0.25);  // C
+    setTimeout(() => playTone(392, 0.3, 'square', 0.25), 150);  // G (lower)
+  } catch (e) {}
+}
+
+// Cheat code activated sound
+export function playCheatActivated() {
+  try {
+    // Magical ascending arpeggio
+    const notes = [262, 330, 392, 523, 659, 784, 1047];
+    notes.forEach((freq, i) => {
+      setTimeout(() => playTone(freq, 0.1, 'sine', 0.2), i * 50);
+    });
+    // Final sparkle
+    setTimeout(() => {
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => playTone(1500 + Math.random() * 500, 0.05, 'sine', 0.15), i * 40);
+      }
+    }, 400);
+  } catch (e) {}
+}
+
+// Secret discovered sound
+export function playSecretFound() {
+  playSequence([
+    { freq: 392, dur: 0.1 },   // G
+    { freq: 523, dur: 0.1 },   // C
+    { freq: 659, dur: 0.1 },   // E
+    { freq: 784, dur: 0.2 },   // G (high)
+  ], 'sine');
+}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useReducer, useCallback, useState } from 'react';
-import { gameReducer, getInitialState } from '@/lib/gameState';
+import { gameReducer, getInitialState, Difficulty } from '@/lib/gameState';
 import * as sounds from '@/lib/sounds';
 import TitleScreen from '@/components/TitleScreen';
 import IntroScreen from '@/components/IntroScreen';
@@ -40,6 +40,14 @@ export default function Home() {
     dispatch({ type: 'CLOSE_LEADERBOARD' });
   }, []);
 
+  const handleGodMode = useCallback(() => {
+    dispatch({ type: 'TOGGLE_GOD_MODE' });
+  }, []);
+
+  const handleSetDifficulty = useCallback((difficulty: Difficulty) => {
+    dispatch({ type: 'SET_DIFFICULTY', difficulty });
+  }, []);
+
   const handleIntroContinue = useCallback(() => {
     sounds.playClick();
     dispatch({ type: 'SHOW_PARTY_SELECT' });
@@ -48,6 +56,11 @@ export default function Home() {
   const handlePartySubmit = useCallback((party: string[]) => {
     sounds.playSelect();
     dispatch({ type: 'SET_PARTY', party });
+  }, []);
+
+  const handlePartySubmitWithBonus = useCallback((party: string[], sprsBonus: number) => {
+    sounds.playSelect();
+    dispatch({ type: 'SET_PARTY_WITH_BONUS', party, sprsBonus });
   }, []);
 
   const handleContinueTrail = useCallback(() => {
@@ -177,6 +190,10 @@ export default function Home() {
         <TitleScreen
           onContinue={handleTitleContinue}
           onLeaderboard={handleLeaderboard}
+          onGodMode={handleGodMode}
+          onSetDifficulty={handleSetDifficulty}
+          godMode={state.godMode}
+          difficulty={state.difficulty}
         />
       );
 
@@ -187,7 +204,7 @@ export default function Home() {
       return <IntroScreen onContinue={handleIntroContinue} />;
 
     case 'party':
-      return <PartySelect onSubmit={handlePartySubmit} />;
+      return <PartySelect onSubmit={handlePartySubmit} onSubmitWithBonus={handlePartySubmitWithBonus} />;
 
     case 'trail':
       return (
@@ -347,6 +364,10 @@ export default function Home() {
         <TitleScreen
           onContinue={handleTitleContinue}
           onLeaderboard={handleLeaderboard}
+          onGodMode={handleGodMode}
+          onSetDifficulty={handleSetDifficulty}
+          godMode={state.godMode}
+          difficulty={state.difficulty}
         />
       );
   }
