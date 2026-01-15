@@ -1,6 +1,6 @@
 'use client';
 
-import { useReducer, useCallback } from 'react';
+import { useReducer, useCallback, useState } from 'react';
 import { gameReducer, getInitialState } from '@/lib/gameState';
 import * as sounds from '@/lib/sounds';
 import TitleScreen from '@/components/TitleScreen';
@@ -16,13 +16,26 @@ import RestingScreen from '@/components/RestingScreen';
 import HuntingScreen from '@/components/HuntingScreen';
 import GameOverScreen from '@/components/GameOverScreen';
 import VictoryScreen from '@/components/VictoryScreen';
+import LeaderboardScreen from '@/components/LeaderboardScreen';
+import NameEntryModal from '@/components/NameEntryModal';
 
 export default function Home() {
   const [state, dispatch] = useReducer(gameReducer, getInitialState());
+  const [showNameEntry, setShowNameEntry] = useState(false);
 
   const handleTitleContinue = useCallback(() => {
     sounds.playStart();
     dispatch({ type: 'START_GAME' });
+  }, []);
+
+  const handleLeaderboard = useCallback(() => {
+    sounds.playClick();
+    dispatch({ type: 'SHOW_LEADERBOARD' });
+  }, []);
+
+  const handleCloseLeaderboard = useCallback(() => {
+    sounds.playClick();
+    dispatch({ type: 'CLOSE_LEADERBOARD' });
   }, []);
 
   const handleIntroContinue = useCallback(() => {
@@ -79,7 +92,6 @@ export default function Home() {
   }, []);
 
   const handleDismissResult = useCallback(() => {
-    // Play appropriate sound based on result
     if (state.lastAnswer?.correct) {
       sounds.playCorrect();
     } else {
@@ -106,13 +118,40 @@ export default function Home() {
 
   const handleRestart = useCallback(() => {
     sounds.playStart();
+    setShowNameEntry(false);
     dispatch({ type: 'RESTART' });
   }, []);
+
+  const handleShowNameEntry = useCallback(() => {
+    setShowNameEntry(true);
+  }, []);
+
+  const handleNameSubmit = useCallback(() => {
+    setShowNameEntry(false);
+  }, []);
+
+  const handleNameSkip = useCallback(() => {
+    setShowNameEntry(false);
+  }, []);
+
+  // Calculate accuracy for leaderboard
+  const accuracy = state.questionsAnswered > 0
+    ? Math.round((state.correctAnswers / state.questionsAnswered) * 100)
+    : 0;
+  const survivors = state.party.filter(m => m.alive).length;
 
   // Render current screen
   switch (state.screen) {
     case 'title':
-      return <TitleScreen onContinue={handleTitleContinue} />;
+      return (
+        <TitleScreen
+          onContinue={handleTitleContinue}
+          onLeaderboard={handleLeaderboard}
+        />
+      );
+
+    case 'leaderboard':
+      return <LeaderboardScreen onClose={handleCloseLeaderboard} />;
 
     case 'intro':
       return <IntroScreen onContinue={handleIntroContinue} />;
@@ -217,13 +256,53 @@ export default function Home() {
       return <HuntingScreen onFinish={handleFinishHunting} />;
 
     case 'gameover':
-      // Play game over sound when screen first shows
-      return <GameOverScreen state={state} onRestart={handleRestart} />;
+      return (
+        <>
+          {showNameEntry && (
+            <NameEntryModal
+              score={state.milesTraveled}
+              accuracy={accuracy}
+              survivors={survivors}
+              won={false}
+              onSubmit={handleNameSubmit}
+              onSkip={handleNameSkip}
+            />
+          )}
+          <GameOverScreen
+            state={state}
+            onRestart={handleRestart}
+            onSubmitScore={handleShowNameEntry}
+          />
+        </>
+      );
 
     case 'victory':
-      return <VictoryScreen state={state} onRestart={handleRestart} />;
+      return (
+        <>
+          {showNameEntry && (
+            <NameEntryModal
+              score={state.milesTraveled}
+              accuracy={accuracy}
+              survivors={survivors}
+              won={true}
+              onSubmit={handleNameSubmit}
+              onSkip={handleNameSkip}
+            />
+          )}
+          <VictoryScreen
+            state={state}
+            onRestart={handleRestart}
+            onSubmitScore={handleShowNameEntry}
+          />
+        </>
+      );
 
     default:
-      return <TitleScreen onContinue={handleTitleContinue} />;
+      return (
+        <TitleScreen
+          onContinue={handleTitleContinue}
+          onLeaderboard={handleLeaderboard}
+        />
+      );
   }
 }

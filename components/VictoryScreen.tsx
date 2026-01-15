@@ -7,9 +7,10 @@ import { playVictory } from '@/lib/sounds';
 interface VictoryScreenProps {
   state: GameState;
   onRestart: () => void;
+  onSubmitScore: () => void;
 }
 
-export default function VictoryScreen({ state, onRestart }: VictoryScreenProps) {
+export default function VictoryScreen({ state, onRestart, onSubmitScore }: VictoryScreenProps) {
   useEffect(() => {
     playVictory();
   }, []);
@@ -74,9 +75,17 @@ export default function VictoryScreen({ state, onRestart }: VictoryScreenProps) 
         </p>
       </div>
 
-      <button className="terminal-btn mt-6" onClick={onRestart}>
-        Play Again
-      </button>
+      <div className="mt-6 flex justify-center gap-4">
+        <button className="terminal-btn" onClick={onRestart}>
+          Play Again
+        </button>
+        <button
+          className="terminal-btn text-terminal-yellow border-terminal-yellow hover:bg-terminal-yellow"
+          onClick={onSubmitScore}
+        >
+          Submit Score
+        </button>
+      </div>
     </div>
   );
 }

@@ -298,6 +298,250 @@ export const CMMC_QUESTIONS: Question[] = [
     answer: "A",
     explanation: "Report to DoD within 72 hours via dibnet.dod.mil. (D is the mood though.)"
   },
+  // === PHASE 1: PLANNING & PREPARATION ===
+  {
+    id: 21,
+    question: "What is Phase 1 of the CMMC assessment process?",
+    options: [
+      "A) Assessment Execution",
+      "B) Planning & Preparation",
+      "C) Reporting",
+      "D) Crying in the break room"
+    ],
+    answer: "B",
+    explanation: "Phase 1 is Planning & Preparation - defining scope, reviewing readiness, and scheduling."
+  },
+  {
+    id: 22,
+    question: "During Phase 1, who must affirm the accuracy of the SPRS score?",
+    options: [
+      "A) The IT intern",
+      "B) A senior company official",
+      "C) The C3PAO",
+      "D) Anyone with a pulse"
+    ],
+    answer: "B",
+    explanation: "A senior official must affirm the SPRS score accuracy - it's a legal attestation!"
+  },
+  {
+    id: 23,
+    question: "What document defines the assessment boundary in Phase 1?",
+    options: [
+      "A) The scoping guide",
+      "B) The employee handbook",
+      "C) A post-it note",
+      "D) The network diagram nobody updated"
+    ],
+    answer: "A",
+    explanation: "The scoping guide helps define which assets are in-scope for CUI processing."
+  },
+  {
+    id: 24,
+    question: "What are the 5 asset categories for CMMC scoping?",
+    options: [
+      "A) CUI, Security, Contractor, Specialty, Out-of-Scope",
+      "B) Red, Blue, Green, Yellow, Purple",
+      "C) Easy, Medium, Hard, Expert, Impossible",
+      "D) Servers, Laptops, Phones, Printers, Feelings"
+    ],
+    answer: "A",
+    explanation: "CUI Assets, Security Protection Assets, Contractor Risk Managed, Specialized, and Out-of-Scope."
+  },
+  {
+    id: 25,
+    question: "How far in advance should you schedule your C3PAO assessment?",
+    options: [
+      "A) 2-3 days",
+      "B) 3-6 months typically",
+      "C) The night before",
+      "D) Never, live in denial forever"
+    ],
+    answer: "B",
+    explanation: "Plan 3-6 months ahead - C3PAOs book up fast and you need prep time!"
+  },
+  // === PHASE 2: ASSESSMENT EXECUTION ===
+  {
+    id: 26,
+    question: "What is Phase 2 of the CMMC assessment?",
+    options: [
+      "A) Planning & Preparation",
+      "B) Assessment Execution",
+      "C) Adjudication",
+      "D) The denial phase"
+    ],
+    answer: "B",
+    explanation: "Phase 2 is Assessment Execution - where the C3PAO actually tests your controls."
+  },
+  {
+    id: 27,
+    question: "What are the three assessment methods used in Phase 2?",
+    options: [
+      "A) Examine, Interview, Test",
+      "B) Hope, Pray, Cry",
+      "C) Read, Write, Arithmetic",
+      "D) Google, Stack Overflow, ChatGPT"
+    ],
+    answer: "A",
+    explanation: "Examine (review docs), Interview (talk to staff), Test (verify controls work)."
+  },
+  {
+    id: 28,
+    question: "During interviews, who should be available to the assessors?",
+    options: [
+      "A) Only the CISO",
+      "B) Personnel responsible for implementing controls",
+      "C) The CEO's assistant",
+      "D) Literally anyone who can fog a mirror"
+    ],
+    answer: "B",
+    explanation: "People who actually implement and operate the controls must be available."
+  },
+  {
+    id: 29,
+    question: "What happens if evidence is missing during Phase 2?",
+    options: [
+      "A) Assessors just skip it",
+      "B) The control may be marked NOT MET",
+      "C) Everyone gets a participation trophy",
+      "D) The audit magically passes anyway"
+    ],
+    answer: "B",
+    explanation: "No evidence = NOT MET. Document everything or suffer the consequences!"
+  },
+  {
+    id: 30,
+    question: "Can you remediate findings during the assessment?",
+    options: [
+      "A) Yes, real-time remediation is allowed",
+      "B) No, what's done is done",
+      "C) Only if you bribe the assessor (illegal)",
+      "D) Only on Tuesdays"
+    ],
+    answer: "A",
+    explanation: "Limited real-time remediation is allowed for minor issues during assessment."
+  },
+  // === PHASE 3: REPORTING ===
+  {
+    id: 31,
+    question: "What is Phase 3 of the CMMC assessment?",
+    options: [
+      "A) Reporting",
+      "B) Celebration",
+      "C) Assessment Execution",
+      "D) The bargaining phase"
+    ],
+    answer: "A",
+    explanation: "Phase 3 is Reporting - documenting findings and creating the assessment report."
+  },
+  {
+    id: 32,
+    question: "What document lists all findings requiring remediation?",
+    options: [
+      "A) The shame spreadsheet",
+      "B) Plan of Action & Milestones (POA&M)",
+      "C) The IT wish list",
+      "D) A very long sticky note"
+    ],
+    answer: "B",
+    explanation: "The POA&M documents all NOT MET findings and remediation timelines."
+  },
+  {
+    id: 33,
+    question: "How long do you have to close POA&M items for conditional certification?",
+    options: [
+      "A) 30 days",
+      "B) 180 days",
+      "C) Forever, no rush",
+      "D) It's already too late"
+    ],
+    answer: "B",
+    explanation: "180 days to close POA&M items or your conditional certification may be revoked."
+  },
+  {
+    id: 34,
+    question: "What determines a MET vs NOT MET finding?",
+    options: [
+      "A) Assessor's mood that day",
+      "B) Whether objectives are satisfied per 800-171A",
+      "C) A coin flip",
+      "D) How good the coffee was"
+    ],
+    answer: "B",
+    explanation: "Assessment objectives from NIST 800-171A determine MET/NOT MET status."
+  },
+  {
+    id: 35,
+    question: "Who reviews the assessment report before submission?",
+    options: [
+      "A) The OSC (Organization Seeking Certification)",
+      "B) Nobody, YOLO",
+      "C) The janitor",
+      "D) A magic 8-ball"
+    ],
+    answer: "A",
+    explanation: "The OSC reviews the report for accuracy before the C3PAO submits to CMMC-AB."
+  },
+  // === PHASE 4: ADJUDICATION & CERTIFICATION ===
+  {
+    id: 36,
+    question: "What is Phase 4 of the CMMC assessment?",
+    options: [
+      "A) Adjudication & Certification",
+      "B) Victory lap",
+      "C) Planning",
+      "D) The acceptance phase"
+    ],
+    answer: "A",
+    explanation: "Phase 4 is Adjudication - where CMMC-AB reviews and issues certification decisions."
+  },
+  {
+    id: 37,
+    question: "What are the two types of CMMC certification?",
+    options: [
+      "A) Conditional and Final",
+      "B) Temporary and Permanent",
+      "C) Good and Better",
+      "D) Real and Imaginary"
+    ],
+    answer: "A",
+    explanation: "Conditional (with POA&M items) or Final (all controls MET)."
+  },
+  {
+    id: 38,
+    question: "How long is a CMMC certification valid?",
+    options: [
+      "A) Forever",
+      "B) 3 years",
+      "C) Until the next breach",
+      "D) 1 year"
+    ],
+    answer: "B",
+    explanation: "CMMC certifications are valid for 3 years, then you get to do it all again!"
+  },
+  {
+    id: 39,
+    question: "What happens if POA&M items aren't closed in 180 days?",
+    options: [
+      "A) Nothing, extensions are automatic",
+      "B) Conditional certification may be revoked",
+      "C) You get a stern email",
+      "D) Free pizza party"
+    ],
+    answer: "B",
+    explanation: "Failure to close POA&M items can result in revocation of conditional certification."
+  },
+  {
+    id: 40,
+    question: "Who issues the final CMMC certification?",
+    options: [
+      "A) The C3PAO",
+      "B) The Cyber AB (formerly CMMC-AB)",
+      "C) Your mom (she's very proud)",
+      "D) The DoD CIO directly"
+    ],
+    answer: "B",
+    explanation: "The Cyber AB (Accreditation Body) issues certifications after reviewing C3PAO reports."
+  },
 ];
 
 export const DEFAULT_PARTY = [

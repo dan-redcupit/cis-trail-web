@@ -13,7 +13,8 @@ export type Screen =
   | 'hunting'
   | 'resting'
   | 'gameover'
-  | 'victory';
+  | 'victory'
+  | 'leaderboard';
 
 export interface PartyMember {
   name: string;
@@ -63,7 +64,9 @@ export type GameAction =
   | { type: 'GIVE_UP' }
   | { type: 'GAME_OVER'; reason: string }
   | { type: 'VICTORY' }
-  | { type: 'RESTART' };
+  | { type: 'RESTART' }
+  | { type: 'SHOW_LEADERBOARD' }
+  | { type: 'CLOSE_LEADERBOARD' };
 
 export function getInitialState(): GameState {
   return {
@@ -385,6 +388,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case 'RESTART':
       return getInitialState();
+
+    case 'SHOW_LEADERBOARD':
+      return { ...state, screen: 'leaderboard' };
+
+    case 'CLOSE_LEADERBOARD':
+      return { ...state, screen: 'title' };
 
     default:
       return state;
