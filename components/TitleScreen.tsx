@@ -54,6 +54,11 @@ export default function TitleScreen({ onContinue, onLeaderboard }: TitleScreenPr
           Leaderboard
         </button>
       </div>
+
+      {/* Version */}
+      <div className="mt-8 text-terminal-green/50 text-xs">
+        v1.0.0
+      </div>
     </div>
   );
 }
