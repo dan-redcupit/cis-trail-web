@@ -3,6 +3,12 @@
 import { useState, useEffect } from 'react';
 import { GameState } from '@/lib/gameState';
 import { playBrrrt } from '@/lib/sounds';
+import MattLeeCharacter, {
+  MATT_TRAIL_STANDING,
+  MATT_TRAIL_WALKING_1,
+  MATT_TRAIL_WALKING_2,
+  MATT_TRAIL_CELEBRATING
+} from './MattLeeCharacter';
 
 interface TrailScreenProps {
   state: GameState;
@@ -14,7 +20,16 @@ interface TrailScreenProps {
   onFireTank?: () => void;
 }
 
-// M1 Abrams Tank ASCII art frames
+// Matt Lee's brand color
+const MATT_BLUE = '#2ea3f2';
+
+// Matt Lee walking animation frames for the trail
+const MATT_FRAMES = [
+  MATT_TRAIL_WALKING_1,
+  MATT_TRAIL_WALKING_2,
+];
+
+// M1 Abrams Tank ASCII art frames (kept for firing feature)
 const TANK_FRAMES = [
   // Frame 1 - Normal
   `       _______________
@@ -90,11 +105,11 @@ export default function TrailScreen({ state, onContinue, onRest, onHunt, onSuppl
     <div className="max-w-2xl mx-auto">
       {/* Header */}
       <div className="text-terminal-green text-center text-xl sm:text-2xl font-bold border-2 border-terminal-green p-2 mb-2">
-        THE CMMC TRAIL
+        THE CIS TRAIL
       </div>
 
       {/* Animated Scene */}
-      <div className="border-2 border-terminal-green p-2 mb-2 overflow-hidden relative" style={{ height: '150px' }}>
+      <div className="border-2 border-terminal-green p-2 mb-2 overflow-hidden relative" style={{ height: '180px' }}>
         {/* Scrolling background scenery */}
         <div className="absolute top-1 w-full text-terminal-cyan text-xs opacity-60">
           <span style={{ position: 'absolute', left: `${(100 - trackOffset * 3) % 100}%` }}>▲</span>
@@ -102,9 +117,19 @@ export default function TrailScreen({ state, onContinue, onRest, onHunt, onSuppl
           <span style={{ position: 'absolute', left: `${(30 - trackOffset * 3) % 100}%` }}>▲</span>
         </div>
 
-        {/* M1 Abrams Tank - centered */}
-        <div className="absolute left-4" style={{ top: '35px' }}>
-          <pre className={`text-[9px] sm:text-[11px] leading-tight font-mono ${showFiring ? 'text-terminal-yellow' : 'text-terminal-green'}`}>
+        {/* Matt Lee Character - walking animation */}
+        <div className="absolute left-4" style={{ top: '15px' }}>
+          <MattLeeCharacter
+            animation="walking"
+            size="compact"
+            animationSpeed={250}
+            style={{ color: MATT_BLUE }}
+          />
+        </div>
+
+        {/* M1 Abrams Tank - behind Matt */}
+        <div className="absolute" style={{ top: '55px', left: '120px' }}>
+          <pre className={`text-[8px] sm:text-[9px] leading-tight font-mono opacity-70 ${showFiring ? 'text-terminal-yellow' : 'text-terminal-green'}`}>
 {showFiring ? TANK_FRAMES[frame === 0 ? 1 : 2] : TANK_FRAMES[0]}
           </pre>
         </div>
@@ -127,7 +152,7 @@ export default function TrailScreen({ state, onContinue, onRest, onHunt, onSuppl
 
         {/* Destination marker */}
         <div className="absolute bottom-4 right-2 text-terminal-green text-xs text-right">
-          <div>CMMC 2.0</div>
+          <div>CIS V8 COMPLIANCE</div>
           <div>→ {milesRemaining}mi</div>
         </div>
       </div>
@@ -162,7 +187,7 @@ export default function TrailScreen({ state, onContinue, onRest, onHunt, onSuppl
 
       {/* Party Status */}
       <div className="border-2 border-terminal-green p-3 mb-2 text-base sm:text-lg">
-        <div className="font-bold mb-2">COMPLIANCE TEAM:</div>
+        <div className="font-bold mb-2">SECURITY TEAM:</div>
         <div className="grid grid-cols-2 gap-1">
           {state.party.map((member, i) => (
             <div key={i} className="flex justify-between">

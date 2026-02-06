@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { GameState } from '@/lib/gameState';
 import { playVictory, playCheatActivated } from '@/lib/sounds';
+import MattLeeCharacter from './MattLeeCharacter';
 
 interface VictoryScreenProps {
   state: GameState;
@@ -135,11 +136,20 @@ export default function VictoryScreen({ state, onRestart, onSubmitScore }: Victo
   return (
     <div className="text-center max-w-2xl mx-auto">
       <div className="border-2 border-terminal-green p-4 sm:p-6">
+        {/* Celebrating Matt Lee character */}
+        <div className="flex justify-center mb-4">
+          <MattLeeCharacter
+            animation="celebrating"
+            size="compact"
+            style={{ transform: 'scale(1.5)' }}
+          />
+        </div>
+
         <div className="text-terminal-green text-xl sm:text-3xl font-bold mb-2">
-          ★ ★ ★ CERTIFIED ★ ★ ★
+          ★ ★ ★ COMPLIANT ★ ★ ★
         </div>
         <div className="text-terminal-green text-lg sm:text-xl mb-4">
-          CMMC LEVEL 2 - ACHIEVED!
+          CIS V8 IG2 - ACHIEVED!
         </div>
 
         <div className="border-t border-terminal-green pt-4 space-y-2 text-sm sm:text-base">
@@ -182,7 +192,7 @@ export default function VictoryScreen({ state, onRestart, onSubmitScore }: Victo
         </div>
 
         <p className="text-terminal-yellow text-sm mt-4 italic">
-          (...until next year's reassessment)
+          (...until next year's CIS benchmark update)
         </p>
       </div>
 

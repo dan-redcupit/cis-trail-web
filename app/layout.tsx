@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'The CMMC Trail',
-  description: 'An Oregon Trail-style game for IT and Compliance professionals surviving the treacherous journey to CMMC 2.0 certification.',
+  title: 'The CIS Trail',
+  description: 'An Oregon Trail-style game for IT and Security professionals surviving the treacherous journey to CIS V8 IG1 & IG2 compliance.',
 }
 
 export default function RootLayout({

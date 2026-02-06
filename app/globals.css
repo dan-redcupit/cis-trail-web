@@ -5,8 +5,11 @@
 @tailwind utilities;
 
 :root {
-  --terminal-green: #00ff00;
-  --terminal-darkgreen: #008800;
+  /* Matt Lee's CIS Benchmark Blue Theme */
+  --terminal-blue: #2ea3f2;
+  --terminal-darkblue: #1a7ac0;
+  --terminal-lightblue: #5bc0ff;
+  /* Keep red and yellow for warnings/errors */
   --terminal-red: #ff4444;
   --terminal-yellow: #ffff00;
   --terminal-cyan: #00ffff;
@@ -19,7 +22,7 @@
 
 html, body {
   background-color: var(--terminal-bg);
-  color: var(--terminal-green);
+  color: var(--terminal-blue);
   font-family: 'VT323', 'Courier New', monospace;
   font-size: 24px;
   line-height: 1.5;
@@ -49,7 +52,15 @@ body::before {
 
 /* Subtle glow effect - reduced for readability */
 .glow {
-  text-shadow: 0 0 2px var(--terminal-green);
+  text-shadow: 0 0 2px var(--terminal-blue);
+}
+
+.glow-blue {
+  text-shadow: 0 0 2px var(--terminal-blue);
+}
+
+.glow-lightblue {
+  text-shadow: 0 0 4px var(--terminal-lightblue);
 }
 
 .glow-red {
@@ -60,19 +71,43 @@ body::before {
   text-shadow: 0 0 2px var(--terminal-yellow);
 }
 
-/* Terminal colors */
-.text-green { color: var(--terminal-green); }
-.text-darkgreen { color: var(--terminal-darkgreen); }
+/* Terminal colors - CIS Benchmark Blue Theme */
+.text-blue { color: var(--terminal-blue); }
+.text-darkblue { color: var(--terminal-darkblue); }
+.text-lightblue { color: var(--terminal-lightblue); }
 .text-red { color: var(--terminal-red); }
 .text-yellow { color: var(--terminal-yellow); }
 .text-cyan { color: var(--terminal-cyan); }
 .text-white { color: #ffffff; }
 
-/* Button styling */
+/* Button styling - CIS Benchmark Blue Theme */
 .terminal-btn {
   background: transparent;
-  border: 2px solid var(--terminal-green);
-  color: var(--terminal-green);
+  border: 2px solid var(--terminal-blue);
+  color: var(--terminal-blue);
+  padding: 12px 24px;
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-shadow: 0 0 2px var(--terminal-blue);
+}
+
+.terminal-btn:hover {
+  background: var(--terminal-blue);
+  color: var(--terminal-bg);
+  text-shadow: none;
+  box-shadow: 0 0 10px var(--terminal-blue), 0 0 20px var(--terminal-darkblue);
+}
+
+.terminal-btn:active {
+  transform: scale(0.98);
+}
+
+.terminal-btn-secondary {
+  background: transparent;
+  border: 2px solid var(--terminal-darkblue);
+  color: var(--terminal-lightblue);
   padding: 12px 24px;
   font-family: 'VT323', monospace;
   font-size: 24px;
@@ -80,22 +115,18 @@ body::before {
   transition: all 0.2s;
 }
 
-.terminal-btn:hover {
-  background: var(--terminal-green);
+.terminal-btn-secondary:hover {
+  background: var(--terminal-darkblue);
   color: var(--terminal-bg);
   text-shadow: none;
 }
 
-.terminal-btn:active {
-  transform: scale(0.98);
-}
-
-/* Input styling */
+/* Input styling - CIS Benchmark Blue Theme */
 .terminal-input {
   background: transparent;
   border: none;
-  border-bottom: 2px solid var(--terminal-green);
-  color: var(--terminal-green);
+  border-bottom: 2px solid var(--terminal-blue);
+  color: var(--terminal-blue);
   font-family: 'VT323', monospace;
   font-size: 24px;
   padding: 8px 12px;
@@ -103,7 +134,8 @@ body::before {
 }
 
 .terminal-input:focus {
-  border-bottom: 2px solid var(--terminal-green);
+  border-bottom: 2px solid var(--terminal-lightblue);
+  box-shadow: 0 2px 4px var(--terminal-darkblue);
 }
 
 /* ASCII box styling */
@@ -129,7 +161,7 @@ pre {
   animation: blink 1s infinite;
 }
 
-/* Scrollbar styling */
+/* Scrollbar styling - CIS Benchmark Blue Theme */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -140,9 +172,9 @@ pre {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--terminal-darkgreen);
+  background: var(--terminal-darkblue);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--terminal-green);
+  background: var(--terminal-blue);
 }

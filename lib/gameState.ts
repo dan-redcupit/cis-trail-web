@@ -1,4 +1,4 @@
-import { Question, ShuffledQuestion, GameEvent, CMMC_QUESTIONS, RANDOM_EVENTS, DEATH_MESSAGES, DEFAULT_PARTY, getShuffledQuestion } from './gameData';
+import { Question, ShuffledQuestion, GameEvent, CIS_QUESTIONS, RANDOM_EVENTS, DEATH_MESSAGES, DEFAULT_PARTY, getShuffledQuestion } from './cisGameData';
 
 export type Screen =
   | 'title'
@@ -164,11 +164,11 @@ export function getInitialState(): GameState {
 }
 
 function getRandomQuestion(state: GameState): ShuffledQuestion {
-  const available = CMMC_QUESTIONS.filter(q => !state.usedQuestions.includes(q.id));
+  const available = CIS_QUESTIONS.filter(q => !state.usedQuestions.includes(q.id));
   let question: Question;
   if (available.length === 0) {
     // Reset used questions if all have been used
-    question = CMMC_QUESTIONS[Math.floor(Math.random() * CMMC_QUESTIONS.length)];
+    question = CIS_QUESTIONS[Math.floor(Math.random() * CIS_QUESTIONS.length)];
   } else {
     question = available[Math.floor(Math.random() * available.length)];
   }
@@ -512,7 +512,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return { ...state, screen: 'trail' };
 
     case 'GIVE_UP':
-      return { ...state, screen: 'gameover', gameOverReason: "You abandoned your CMMC journey to start an organic vegetable farm in Vermont. The DoD is disappointed but respects your decision." };
+      return { ...state, screen: 'gameover', gameOverReason: "You abandoned your CIS compliance journey to start an organic vegetable farm in Vermont. The security team is disappointed but respects your decision." };
 
     case 'GAME_OVER':
       return { ...state, screen: 'gameover', gameOverReason: action.reason };
@@ -635,7 +635,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
               ...state,
               party,
               totalDeaths: state.totalDeaths + 1,
-              lastDeath: { name: victim.name, message: "quit in frustration after leadership denied CMMC funding... again" },
+              lastDeath: { name: victim.name, message: "quit in frustration after leadership denied CIS Controls funding... again" },
               morale: Math.max(0, state.morale - 30),
               screen: 'death'
             };

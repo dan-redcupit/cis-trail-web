@@ -17,10 +17,10 @@ interface TitleScreenProps {
 const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
 const DIFFICULTY_LABELS: Record<Difficulty, { name: string; color: string; description: string }> = {
-  easy: { name: 'Compliance Intern', color: 'text-green-400', description: '+50% morale, -50% death chance' },
-  normal: { name: 'Security Analyst', color: 'text-terminal-green', description: 'Standard difficulty' },
-  hard: { name: 'Audit Season', color: 'text-terminal-yellow', description: '+50% bad events, tougher questions' },
-  nightmare: { name: 'Congressional Hearing', color: 'text-terminal-red', description: 'One wrong answer = game over' },
+  easy: { name: 'IG1 Starter', color: 'text-green-400', description: '+50% morale, -50% death chance' },
+  normal: { name: 'IG2 Professional', color: 'text-terminal-green', description: 'Standard difficulty' },
+  hard: { name: 'Full Compliance', color: 'text-terminal-yellow', description: '+50% bad events, tougher questions' },
+  nightmare: { name: 'External Audit', color: 'text-terminal-red', description: 'One wrong answer = game over' },
 };
 
 export default function TitleScreen({
@@ -125,7 +125,7 @@ export default function TitleScreen({
             <div className="text-left text-terminal-green text-sm space-y-4">
               <div>
                 <div className="text-terminal-cyan font-bold">OBJECTIVE:</div>
-                <p>Lead your compliance team 2,000 miles to CMMC 2.0 certification. Answer questions correctly to progress!</p>
+                <p>Lead your security team 2,000 miles to CIS V8 compliance. Answer questions correctly to progress!</p>
               </div>
 
               <div>
@@ -145,7 +145,7 @@ export default function TitleScreen({
               <div>
                 <div className="text-terminal-cyan font-bold">SPECIAL EVENTS:</div>
                 <p><span className="font-bold">River Crossing</span> - Choose how to cross (some options are risky)</p>
-                <p><span className="font-bold">Valley of Despair</span> - Convince leadership CMMC matters</p>
+                <p><span className="font-bold">Valley of Despair</span> - Convince leadership CIS matters</p>
               </div>
 
               <div>
@@ -197,7 +197,7 @@ export default function TitleScreen({
             THE
           </div>
           <div className="text-5xl sm:text-7xl font-bold tracking-widest mb-2">
-            CMMC
+            CIS
           </div>
           <div className="text-4xl sm:text-6xl font-bold tracking-wider">
             TRAIL
@@ -211,7 +211,7 @@ export default function TitleScreen({
 
         {/* Subtitle */}
         <div className="text-terminal-green text-lg sm:text-xl">
-          The Journey to CMMC 2.0 Certification
+          The Journey to CIS V8 IG1 & IG2 Compliance
         </div>
 
         {/* Year - clickable easter egg */}
@@ -224,7 +224,7 @@ export default function TitleScreen({
 
         {/* Flavor text */}
         <div className="mt-6 text-terminal-yellow text-sm italic">
-          "You have died of unencrypted data exposure"
+          "You have died of unpatched vulnerabilities"
         </div>
 
         {/* God Mode indicator */}
@@ -284,6 +284,11 @@ export default function TitleScreen({
       {/* Version */}
       <div className="mt-8 text-terminal-green/50 text-xs">
         v1.0.2 {godMode && '(cheater)'}
+      </div>
+
+      {/* Credit */}
+      <div className="mt-2 text-terminal-green/40 text-xs">
+        Inspired by Matt Lee
       </div>
 
       {/* Retro mode footer */}

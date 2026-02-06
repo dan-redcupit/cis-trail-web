@@ -9,7 +9,7 @@ interface ValleyOfDespairScreenProps {
 const VALLEY_ART = `
         ╔═══════════════════════════════════╗
         ║   THE VALLEY OF DESPAIR          ║
-        ║   "Is CMMC even real?"            ║
+        ║   "Is CIS even necessary?"        ║
         ╚═══════════════════════════════════╝
           \\                               /
            \\    "It's just FUD..."       /
@@ -29,7 +29,7 @@ const LEADERSHIP_OBJECTIONS = [
   "Can't we just check the boxes and move on?",
   "Our IT guy says we're already secure.",
   "The competition isn't doing this...",
-  "Let's wait and see if CMMC is actually enforced.",
+  "Let's wait and see if CIS is actually required.",
   "Security is an IT problem, not a business problem.",
   "We'll just hire a consultant when we need to.",
   "Our firewall is fine. We bought the expensive one.",
@@ -43,14 +43,14 @@ export default function ValleyOfDespairScreen({ onConvince }: ValleyOfDespairScr
 
   const responses = [
     {
-      text: "Show them the contract requirements (logical)",
+      text: "Show them the CIS benchmarks (logical)",
       success: 0.7,
-      description: "Present DFARS 252.204-7012 and flow-down requirements"
+      description: "Present CIS Controls V8 framework and IG requirements"
     },
     {
       text: "Explain the business risk (fear)",
       success: 0.5,
-      description: "Discuss False Claims Act liability and contract loss"
+      description: "Discuss breach costs and cyber insurance requirements"
     },
     {
       text: "Promise it won't be that expensive (lie)",
@@ -60,7 +60,7 @@ export default function ValleyOfDespairScreen({ onConvince }: ValleyOfDespairScr
     {
       text: "Show competitor success stories (FOMO)",
       success: 0.6,
-      description: "Demonstrate how others won contracts with CMMC"
+      description: "Demonstrate how others prevented breaches with CIS"
     },
   ];
 
@@ -76,7 +76,7 @@ export default function ValleyOfDespairScreen({ onConvince }: ValleyOfDespairScr
           ⚠ THE VALLEY OF DESPAIR ⚠
         </div>
         <div className="text-terminal-cyan text-sm mb-4">
-          Convincing Leadership That CMMC Is Real
+          Convincing Leadership That CIS Is Necessary
         </div>
 
         <pre className="text-terminal-yellow text-[10px] sm:text-xs mb-4 leading-tight opacity-80">

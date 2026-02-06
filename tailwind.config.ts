@@ -10,8 +10,11 @@ const config: Config = {
     extend: {
       colors: {
         terminal: {
-          green: '#00ff00',
-          darkgreen: '#008800',
+          /* Matt Lee's CIS Benchmark Blue Theme */
+          blue: '#2ea3f2',
+          darkblue: '#1a7ac0',
+          lightblue: '#5bc0ff',
+          /* Keep red and yellow for warnings/errors */
           red: '#ff4444',
           yellow: '#ffff00',
           cyan: '#00ffff',
