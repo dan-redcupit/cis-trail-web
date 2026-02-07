@@ -25,7 +25,7 @@ export default function ResultScreen({ quality, explanation, bestAnswer, goodExp
               The auditor nods approvingly. That's exactly right!
               Your team advances confidently.
             </p>
-            <div className="text-terminal-cyan text-sm mb-2">+200 miles | +15 morale | +7 SPRS</div>
+            <div className="text-terminal-cyan text-sm mb-2">+50 miles | +10 morale</div>
           </>
         ) : quality === 'good' ? (
           <>
@@ -35,7 +35,7 @@ export default function ResultScreen({ quality, explanation, bestAnswer, goodExp
             <p className="text-terminal-yellow text-base sm:text-lg mb-4">
               The auditor tilts their head. "Close enough... but {bestAnswer} would have been better."
             </p>
-            <div className="text-terminal-cyan text-sm mb-2">+100 miles | +5 morale | +3 SPRS</div>
+            <div className="text-terminal-cyan text-sm mb-2">+35 miles | +5 morale</div>
             {goodExplanation && (
               <div className="border-t border-terminal-yellow pt-3 mt-3">
                 <p className="text-terminal-yellow text-sm">
@@ -53,7 +53,7 @@ export default function ResultScreen({ quality, explanation, bestAnswer, goodExp
               The auditor frowns and makes a note in their tablet.
               The correct answer was: <span className="font-bold">{bestAnswer}</span>
             </p>
-            <div className="text-terminal-red text-sm mb-2">+25 miles | -20 morale | -10 SPRS | ☠️ Risk of death!</div>
+            <div className="text-terminal-red text-sm mb-2">+15 miles | -15 morale | ☠️ Risk of death!</div>
           </>
         )}
 

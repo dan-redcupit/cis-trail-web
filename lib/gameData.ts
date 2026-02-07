@@ -61,7 +61,7 @@ export function getShuffledQuestion(q: Question): ShuffledQuestion {
 export const DEATH_MESSAGES: string[] = [
   "has died of unencrypted data exposure",
   "was lost to a ransomware attack while reviewing the SSP",
-  "perished from acute SPRS score anxiety",
+  "perished from acute audit anxiety",
   "succumbed to a fatal case of scope creep",
   "was carried away by rogue auditors",
   "drowned in a sea of POA&M items",
@@ -112,7 +112,7 @@ export const RANDOM_EVENTS: GameEvent[] = [
 
   // Good events
   { text: "You found an abandoned System Security Plan template on the trail! Team morale increases.", type: "good" },
-  { text: "Good news! Your SPRS score went up by 3 points!", type: "good" },
+  { text: "Good news! Your audit prep is going well!", type: "good" },
   { text: "A consultant wagon passes by and drops some free templates!", type: "good" },
   { text: "You successfully convinced leadership to fund the project! Morale soars!", type: "good" },
   { text: "Your POA&M milestones are all GREEN! Is this real life?", type: "good" },
@@ -188,17 +188,17 @@ export const CMMC_QUESTIONS: Question[] = [
   },
   {
     id: 3,
-    question: "What is the minimum SPRS score possible?",
+    question: "What framework does CMMC Level 2 primarily align with?",
     options: [
-      "-203",
-      "-110",
-      "0",
-      "-171"
+      "NIST SP 800-171",
+      "ISO 27001",
+      "SOC 2",
+      "PCI-DSS"
     ],
     bestAnswerIndex: 0,
     goodAnswerIndex: 1,
-    explanation: "-203 is the minimum SPRS score, calculated from weighted requirement values.",
-    goodExplanation: "Good logic thinking one point per control, but the actual weighted minimum is -203."
+    explanation: "CMMC Level 2 is directly aligned with NIST SP 800-171 requirements for protecting CUI.",
+    goodExplanation: "ISO 27001 is a respected security framework but CMMC Level 2 specifically maps to NIST 800-171."
   },
 
   // ============ NIST 800-171 CONTROL FAMILIES ============
@@ -692,14 +692,14 @@ export const CMMC_QUESTIONS: Question[] = [
     id: 37,
     question: "What is required for an 'Affirmation' in CMMC?",
     options: [
-      "A senior official affirming continued compliance annually in SPRS",
+      "A senior official affirming continued compliance annually",
       "A signed contract with the DoD",
       "A physical inspection of facilities",
       "A letter from the C3PAO"
     ],
     bestAnswerIndex: 0,
     goodAnswerIndex: 3,
-    explanation: "Annual affirmation by a senior official in SPRS confirms continued compliance.",
+    explanation: "Annual affirmation by a senior official confirms continued compliance.",
     goodExplanation: "C3PAOs conduct assessments but affirmation is the organization's responsibility."
   },
   {

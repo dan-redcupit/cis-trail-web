@@ -5,7 +5,6 @@ import { StoreItem, STORE_ITEMS } from '@/lib/gameState';
 import * as sounds from '@/lib/sounds';
 
 interface SupplyStoreScreenProps {
-  sprsScore: number;
   morale: number;
   deathShield: boolean;
   onBuyItem: (item: StoreItem) => void;
@@ -13,18 +12,18 @@ interface SupplyStoreScreenProps {
 }
 
 export default function SupplyStoreScreen({
-  sprsScore,
   morale,
   deathShield,
   onBuyItem,
   onLeave
 }: SupplyStoreScreenProps) {
   const [purchaseMessage, setPurchaseMessage] = useState<string | null>(null);
+  const [purchasedItems, setPurchasedItems] = useState<Set<string>>(new Set());
 
   const handleBuy = (item: StoreItem) => {
-    if (sprsScore < item.cost) {
+    if (purchasedItems.has(item.id)) {
       sounds.playWrong();
-      setPurchaseMessage("Not enough SPRS points!");
+      setPurchaseMessage("Already grabbed that one!");
       setTimeout(() => setPurchaseMessage(null), 2000);
       return;
     }
@@ -38,7 +37,8 @@ export default function SupplyStoreScreen({
 
     sounds.playCashRegister();
     onBuyItem(item);
-    setPurchaseMessage(`Purchased ${item.name}!`);
+    setPurchasedItems(prev => new Set(Array.from(prev).concat(item.id)));
+    setPurchaseMessage(`Grabbed ${item.name}!`);
     setTimeout(() => setPurchaseMessage(null), 1500);
   };
 
@@ -61,9 +61,6 @@ export default function SupplyStoreScreen({
         {/* Player Stats */}
         <div className="flex justify-center gap-6 mb-4 text-sm">
           <div className="text-terminal-cyan">
-            SPRS: <span className="text-terminal-green font-bold">{sprsScore}</span>
-          </div>
-          <div className="text-terminal-cyan">
             Morale: <span className="text-terminal-green font-bold">{morale}%</span>
           </div>
           {deathShield && (
@@ -83,9 +80,9 @@ export default function SupplyStoreScreen({
         {/* Items Grid */}
         <div className="space-y-2 text-left max-h-[50vh] overflow-y-auto">
           {STORE_ITEMS.map((item) => {
-            const canAfford = sprsScore >= item.cost;
+            const isOwned = purchasedItems.has(item.id);
             const isShieldOwned = item.effect === 'shield' && deathShield;
-            const disabled = !canAfford || isShieldOwned;
+            const disabled = isOwned || isShieldOwned;
 
             return (
               <div
@@ -104,31 +101,18 @@ export default function SupplyStoreScreen({
                       {item.effect === 'morale' && item.moraleBonus && (
                         <span className="text-terminal-cyan">+{item.moraleBonus} morale</span>
                       )}
-                      {item.effect === 'sprs' && item.sprsBonus && (
-                        <span className="text-terminal-cyan">+{item.sprsBonus} SPRS (net: +{item.sprsBonus - item.cost})</span>
-                      )}
                       {item.effect === 'shield' && (
                         <span className="text-green-400">Prevents next random death</span>
-                      )}
-                      {item.effect === 'both' && (
-                        <span className="text-terminal-cyan">
-                          {item.moraleBonus && `${item.moraleBonus > 0 ? '+' : ''}${item.moraleBonus} morale`}
-                          {item.moraleBonus && item.sprsBonus && ', '}
-                          {item.sprsBonus && `+${item.sprsBonus} SPRS`}
-                        </span>
                       )}
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2">
-                    <div className={`text-sm ${canAfford ? 'text-terminal-yellow' : 'text-terminal-red'}`}>
-                      {item.cost} SPRS
-                    </div>
                     <button
                       className={`terminal-btn text-xs px-3 py-1 ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                       onClick={() => handleBuy(item)}
                       disabled={disabled}
                     >
-                      {isShieldOwned ? 'Owned' : canAfford ? 'Buy' : 'Need SPRS'}
+                      {isOwned || isShieldOwned ? 'Grabbed' : 'Grab'}
                     </button>
                   </div>
                 </div>
@@ -140,7 +124,7 @@ export default function SupplyStoreScreen({
         {/* Shopkeeper */}
         <div className="mt-4 pt-4 border-t border-terminal-green/30">
           <div className="text-terminal-green/60 text-xs italic">
-            The shopkeeper eyes your SPRS score nervously...
+            The shopkeeper nods approvingly as you gather supplies...
           </div>
         </div>
       </div>

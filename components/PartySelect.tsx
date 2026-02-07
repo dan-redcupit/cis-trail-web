@@ -6,18 +6,18 @@ import * as sounds from '@/lib/sounds';
 
 interface PartySelectProps {
   onSubmit: (party: string[]) => void;
-  onSubmitWithBonus: (party: string[], sprsBonus: number) => void;
+  onSubmitWithBonus: (party: string[], moraleBonus: number) => void;
 }
 
 // Secret names and their effects
-const SECRET_NAMES: Record<string, { displayName: string; sprsBonus: number; message: string }> = {
-  'KEVIN': { displayName: 'Kevin Mitnick (reformed)', sprsBonus: 10, message: 'A legendary hacker joins your team! +10 SPRS' },
-  'CLIPPY': { displayName: 'Clippy the Security Assistant', sprsBonus: 5, message: '"It looks like you\'re trying to achieve compliance!" +5 SPRS' },
-  'ADMIN': { displayName: 'Administrator (password: admin)', sprsBonus: -20, message: 'Security worst practice detected! -20 SPRS' },
-  'SNOWDEN': { displayName: 'Edward S. (location unknown)', sprsBonus: 0, message: 'A controversial recruit... Events will be more frequent.' },
-  'SATOSHI': { displayName: 'Satoshi Nakamoto', sprsBonus: 15, message: 'The mysterious crypto legend joins! +15 SPRS' },
-  'CYBERCOM': { displayName: 'US CYBERCOM Agent', sprsBonus: 20, message: 'Government reinforcements arrive! +20 SPRS' },
-  'DEFCON': { displayName: 'DEF CON Attendee', sprsBonus: 8, message: 'A hacker conference veteran joins! +8 SPRS' },
+const SECRET_NAMES: Record<string, { displayName: string; moraleBonus: number; message: string }> = {
+  'KEVIN': { displayName: 'Kevin Mitnick (reformed)', moraleBonus: 10, message: 'A legendary hacker joins your team! +10 Morale' },
+  'CLIPPY': { displayName: 'Clippy the Security Assistant', moraleBonus: 5, message: '"It looks like you\'re trying to achieve compliance!" +5 Morale' },
+  'ADMIN': { displayName: 'Administrator (password: admin)', moraleBonus: -20, message: 'Security worst practice detected! -20 Morale' },
+  'SNOWDEN': { displayName: 'Edward S. (location unknown)', moraleBonus: 0, message: 'A controversial recruit... Events will be more frequent.' },
+  'SATOSHI': { displayName: 'Satoshi Nakamoto', moraleBonus: 15, message: 'The mysterious crypto legend joins! +15 Morale' },
+  'CYBERCOM': { displayName: 'US CYBERCOM Agent', moraleBonus: 20, message: 'Government reinforcements arrive! +20 Morale' },
+  'DEFCON': { displayName: 'DEF CON Attendee', moraleBonus: 8, message: 'A hacker conference veteran joins! +8 Morale' },
 };
 
 export default function PartySelect({ onSubmit, onSubmitWithBonus }: PartySelectProps) {
@@ -40,7 +40,7 @@ export default function PartySelect({ onSubmit, onSubmitWithBonus }: PartySelect
       const upperName = name.trim().toUpperCase();
       const secret = SECRET_NAMES[upperName];
       if (secret) {
-        bonus += secret.sprsBonus;
+        bonus += secret.moraleBonus;
         messages.push(secret.message);
         return secret.displayName;
       }
@@ -83,7 +83,7 @@ export default function PartySelect({ onSubmit, onSubmitWithBonus }: PartySelect
             {secretFound}
           </div>
           <div className={`text-2xl font-bold mt-4 ${totalBonus >= 0 ? 'text-green-400' : 'text-terminal-red'}`}>
-            {totalBonus >= 0 ? '+' : ''}{totalBonus} SPRS
+            {totalBonus >= 0 ? '+' : ''}{totalBonus} Morale
           </div>
         </div>
       </div>

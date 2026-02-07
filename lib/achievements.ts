@@ -15,7 +15,7 @@ export const ACHIEVEMENTS: Omit<Achievement, 'unlocked' | 'unlockedAt'>[] = [
   { id: 'perfect_run', name: 'Legendary CISO', description: 'Win with 100% accuracy and no deaths', icon: '👑' },
   { id: 'intern_revenge', name: "Intern's Revenge", description: 'Win with only the intern surviving', icon: '📎' },
   { id: 'solo_survivor', name: 'Sole Survivor', description: 'Win with only 1 party member alive', icon: '🦸' },
-  { id: 'against_all_odds', name: 'Against All Odds', description: 'Win with a negative SPRS score', icon: '🎲' },
+  { id: 'against_all_odds', name: 'Against All Odds', description: 'Win with morale below 25%', icon: '🎲' },
 
   // Death achievements
   { id: 'first_blood', name: 'First Blood', description: 'Lose your first team member', icon: '💀' },

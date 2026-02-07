@@ -17,7 +17,6 @@ export default function SuppliesScreen({ onClose }: SuppliesScreenProps) {
             <div className="text-terminal-cyan font-bold mb-1">Documentation:</div>
             <div className="text-terminal-green ml-2 space-y-1">
               <div>📋 System Security Plan (SSP) ........... 1</div>
-              <div>📊 SPRS Score Submission ................ 1</div>
               <div>📝 POA&M Spreadsheet .................... 47 items</div>
               <div>📁 Evidence Folders ..................... 17 domains</div>
               <div>📖 NIST 800-171 (tear-stained) .......... 1</div>

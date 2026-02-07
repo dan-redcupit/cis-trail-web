@@ -181,7 +181,7 @@ export default function TrailScreen({ state, onContinue, onRest, onHunt, onSuppl
         </div>
         <div className="flex justify-between">
           <span>Morale: {state.morale}%</span>
-          <span>SPRS Score: {state.sprsScore}</span>
+          <span>Team: {state.party.filter(m => m.alive).length}/{state.party.length} alive</span>
         </div>
       </div>
 

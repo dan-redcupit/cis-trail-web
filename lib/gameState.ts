@@ -33,7 +33,6 @@ export interface GameState {
   milesTraveled: number;
   totalMiles: number;
   morale: number;
-  sprsScore: number;
   questionsAnswered: number;
   correctAnswers: number;
   usedQuestions: number[];
@@ -69,20 +68,16 @@ export interface StoreItem {
   id: string;
   name: string;
   description: string;
-  cost: number;  // SPRS cost
-  effect: 'morale' | 'sprs' | 'shield' | 'both';
+  effect: 'morale' | 'shield';
   moraleBonus?: number;
-  sprsBonus?: number;
 }
 
 export const STORE_ITEMS: StoreItem[] = [
-  { id: 'training', name: 'Security Awareness Training', description: 'Mandatory fun for the whole team', cost: 5, effect: 'morale', moraleBonus: 15 },
-  { id: 'consultant', name: 'Expensive Consultant', description: 'They have a nice suit and a PowerPoint', cost: 10, effect: 'both', sprsBonus: 8, moraleBonus: -5 },
-  { id: 'pizza', name: 'Pizza for the Team', description: 'The universal motivator', cost: 3, effect: 'morale', moraleBonus: 25 },
-  { id: 'edr', name: 'EDR License Renewal', description: 'Protection against the next incident', cost: 8, effect: 'shield' },
-  { id: 'coffee', name: 'Premium Coffee Supply', description: 'Fuel for late-night compliance work', cost: 2, effect: 'morale', moraleBonus: 10 },
-  { id: 'templates', name: 'Compliance Templates Pack', description: 'Pre-written policies (just add logo!)', cost: 6, effect: 'sprs', sprsBonus: 5 },
-  { id: 'audit_prep', name: 'Audit Prep Workshop', description: 'Practice your poker face', cost: 7, effect: 'both', sprsBonus: 3, moraleBonus: 10 },
+  { id: 'training', name: 'Security Awareness Training', description: 'Mandatory fun for the whole team', effect: 'morale', moraleBonus: 15 },
+  { id: 'pizza', name: 'Pizza for the Team', description: 'The universal motivator', effect: 'morale', moraleBonus: 25 },
+  { id: 'edr', name: 'EDR License Renewal', description: 'Protection against the next incident', effect: 'shield' },
+  { id: 'coffee', name: 'Premium Coffee Supply', description: 'Fuel for late-night compliance work', effect: 'morale', moraleBonus: 10 },
+  { id: 'audit_prep', name: 'Audit Prep Workshop', description: 'Practice your poker face', effect: 'morale', moraleBonus: 20 },
 ];
 
 export type GameAction =
@@ -120,7 +115,7 @@ export type GameAction =
   | { type: 'CONVINCE_LEADERSHIP'; success: boolean }
   | { type: 'TOGGLE_GOD_MODE' }
   | { type: 'SET_DIFFICULTY'; difficulty: Difficulty }
-  | { type: 'SET_PARTY_WITH_BONUS'; party: string[]; sprsBonus: number }
+  | { type: 'SET_PARTY_WITH_BONUS'; party: string[]; moraleBonus: number }
   | { type: 'SHOW_STORE'; milestone: number }
   | { type: 'BUY_ITEM'; item: StoreItem }
   | { type: 'LEAVE_STORE' }
@@ -136,7 +131,6 @@ export function getInitialState(): GameState {
     milesTraveled: 0,
     totalMiles: 2000,
     morale: 100,
-    sprsScore: 50,
     questionsAnswered: 0,
     correctAnswers: 0,
     usedQuestions: [],
@@ -321,7 +315,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           consecutiveCorrect: state.consecutiveCorrect + 1,
           milesTraveled: Math.min(state.totalMiles, state.milesTraveled + 50),
           morale: Math.min(100, state.morale + 10),
-          sprsScore: Math.min(110, state.sprsScore + 5),
         };
       } else if (isGood) {
         // GOOD answer: Partial credit, still counts as correct
@@ -331,7 +324,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           consecutiveCorrect: state.consecutiveCorrect + 1,
           milesTraveled: Math.min(state.totalMiles, state.milesTraveled + 35),
           morale: Math.min(100, state.morale + 5),
-          sprsScore: Math.min(110, state.sprsScore + 2),
         };
       } else {
         // WRONG answer: Penalties, reset consecutive streak
@@ -340,7 +332,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           consecutiveCorrect: 0,
           milesTraveled: state.milesTraveled + 15,
           morale: Math.max(0, state.morale - 15),
-          sprsScore: Math.max(-203, state.sprsScore - 8),
         };
 
         // 50% chance of death on wrong answer
@@ -410,14 +401,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           newState = {
             ...newState,
             morale: Math.min(100, state.morale + 15),
-            sprsScore: Math.min(110, state.sprsScore + 5),
           };
           break;
         case 'bad':
           newState = {
             ...newState,
             morale: Math.max(0, state.morale - 15),
-            sprsScore: Math.max(-203, state.sprsScore - 10),
           };
           break;
       }
@@ -480,20 +469,18 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         newState = {
           ...newState,
           morale: Math.max(0, state.morale - 10),
-          sprsScore: Math.max(-203, state.sprsScore - 15),
         };
       } else if (findings > 10) {
         severity = 'moderate';
         newState = {
           ...newState,
-          sprsScore: Math.max(-203, state.sprsScore - 5),
+          morale: Math.max(0, state.morale - 5),
         };
       } else {
         severity = 'low';
         newState = {
           ...newState,
           morale: Math.min(100, state.morale + 5),
-          sprsScore: Math.min(110, state.sprsScore + 10),
         };
       }
 
@@ -552,7 +539,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         return {
           ...state,
           morale: Math.max(0, state.morale - 25),
-          sprsScore: Math.max(-203, state.sprsScore - 10),
           milesTraveled: state.milesTraveled + 25,
           screen: 'trail',
           animationFrame: state.animationFrame + 1
@@ -596,7 +582,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         return {
           ...state,
           morale: Math.max(0, state.morale - 30),
-          sprsScore: Math.max(-203, state.sprsScore - 15),
           milesTraveled: state.milesTraveled + 25,
           screen: 'trail',
           animationFrame: state.animationFrame + 1
@@ -620,7 +605,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         return {
           ...state,
           morale: Math.min(100, state.morale + 30),
-          sprsScore: Math.min(110, state.sprsScore + 10),
           milesTraveled: state.milesTraveled + 75,
           screen: 'trail',
           animationFrame: state.animationFrame + 1
@@ -644,7 +628,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         return {
           ...state,
           morale: Math.max(0, state.morale - 30),
-          sprsScore: Math.max(-203, state.sprsScore - 5),
           milesTraveled: state.milesTraveled + 25,
           screen: 'trail',
           animationFrame: state.animationFrame + 1
@@ -664,7 +647,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         party,
-        sprsScore: Math.min(110, Math.max(-203, state.sprsScore + action.sprsBonus)),
+        morale: Math.min(100, Math.max(0, state.morale + action.moraleBonus)),
         secretNameUsed: true,
         screen: 'trail'
       };
@@ -676,31 +659,17 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case 'BUY_ITEM': {
       const item = action.item;
-      // Check if player can afford it
-      if (state.sprsScore < item.cost) {
-        return state; // Can't afford
-      }
 
       let newState = {
         ...state,
-        sprsScore: state.sprsScore - item.cost,
         itemsBought: state.itemsBought + 1,
       };
 
       // Apply item effects
       if (item.effect === 'morale' && item.moraleBonus) {
         newState.morale = Math.min(100, Math.max(0, newState.morale + item.moraleBonus));
-      } else if (item.effect === 'sprs' && item.sprsBonus) {
-        newState.sprsScore = Math.min(110, newState.sprsScore + item.sprsBonus);
       } else if (item.effect === 'shield') {
         newState.deathShield = true;
-      } else if (item.effect === 'both') {
-        if (item.moraleBonus) {
-          newState.morale = Math.min(100, Math.max(0, newState.morale + item.moraleBonus));
-        }
-        if (item.sprsBonus) {
-          newState.sprsScore = Math.min(110, newState.sprsScore + item.sprsBonus);
-        }
       }
 
       return newState;

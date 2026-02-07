@@ -130,9 +130,9 @@ export default function TitleScreen({
 
               <div>
                 <div className="text-terminal-cyan font-bold">ANSWERS:</div>
-                <p><span className="text-green-400">PERFECT</span> - Best answer: +100 miles, +10 morale, +5 SPRS</p>
-                <p><span className="text-terminal-yellow">ACCEPTABLE</span> - Good answer: +75 miles, +5 morale, +2 SPRS</p>
-                <p><span className="text-terminal-red">INCORRECT</span> - Wrong: +25 miles, -15 morale, -8 SPRS, 50% death chance</p>
+                <p><span className="text-green-400">PERFECT</span> - Best answer: +50 miles, +10 morale</p>
+                <p><span className="text-terminal-yellow">ACCEPTABLE</span> - Good answer: +35 miles, +5 morale</p>
+                <p><span className="text-terminal-red">INCORRECT</span> - Wrong: +15 miles, -15 morale, 50% death chance</p>
               </div>
 
               <div>

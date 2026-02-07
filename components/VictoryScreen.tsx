@@ -50,12 +50,12 @@ function getSpecialEnding(state: GameState, survivors: { name: string; alive: bo
     };
   }
 
-  // Against All Odds: Won with negative SPRS
-  if (state.sprsScore < 0) {
+  // Against All Odds: Won with low morale
+  if (state.morale < 25) {
     return {
       title: '★ AGAINST ALL ODDS ★',
       subtitle: 'CERTIFIED DESPITE EVERYTHING',
-      special: `You achieved certification with a SPRS of ${state.sprsScore}. The auditors are baffled.`,
+      special: `You achieved certification with only ${state.morale}% morale. The auditors are impressed by your perseverance.`,
       color: 'text-red-400'
     };
   }
@@ -111,10 +111,6 @@ export default function VictoryScreen({ state, onRestart, onSubmitScore }: Victo
               <span>Accuracy:</span>
               <span>{accuracy}%</span>
             </div>
-            <div className="flex justify-between">
-              <span>Final SPRS Score:</span>
-              <span>{state.sprsScore}</span>
-            </div>
           </div>
         </div>
 
@@ -168,10 +164,6 @@ export default function VictoryScreen({ state, onRestart, onSubmitScore }: Victo
           <div className="flex justify-between">
             <span>Final Morale:</span>
             <span>{state.morale}%</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Final SPRS Score:</span>
-            <span>{state.sprsScore}</span>
           </div>
         </div>
 

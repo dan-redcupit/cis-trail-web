@@ -72,9 +72,9 @@ export default function Home() {
     dispatch({ type: 'SET_PARTY', party });
   }, []);
 
-  const handlePartySubmitWithBonus = useCallback((party: string[], sprsBonus: number) => {
+  const handlePartySubmitWithBonus = useCallback((party: string[], moraleBonus: number) => {
     sounds.playSelect();
-    dispatch({ type: 'SET_PARTY_WITH_BONUS', party, sprsBonus });
+    dispatch({ type: 'SET_PARTY_WITH_BONUS', party, moraleBonus });
   }, []);
 
   const handleContinueTrail = useCallback(() => {
@@ -279,7 +279,7 @@ export default function Home() {
       }
 
       // Against all odds
-      if (state.sprsScore < 0) {
+      if (state.morale < 25) {
         unlockAchievement('against_all_odds');
       }
 
@@ -296,7 +296,7 @@ export default function Home() {
         unlockAchievement('total_party_kill');
       }
     }
-  }, [state.screen, state.difficulty, state.party, accuracy, state.sprsScore, state.questionsAnswered]);
+  }, [state.screen, state.difficulty, state.party, accuracy, state.morale, state.questionsAnswered]);
 
   // Render current screen
   switch (state.screen) {
@@ -444,7 +444,6 @@ export default function Home() {
     case 'store':
       return (
         <SupplyStoreScreen
-          sprsScore={state.sprsScore}
           morale={state.morale}
           deathShield={state.deathShield}
           onBuyItem={handleBuyItem}
