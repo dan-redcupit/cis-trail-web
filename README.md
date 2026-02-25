@@ -1,18 +1,18 @@
 # CIS Benchmark Trail
 
-A retro Oregon Trail-style game that gamifies the journey toward CIS (Center for Internet Security) compliance and CMMC (Cybersecurity Maturity Model Certification). Lead your team 2,000 miles through the treacherous path to security compliance while managing morale, answering cybersecurity questions, and avoiding compliance disasters.
+A retro Oregon Trail-style game that gamifies the journey toward CIS (Center for Internet Security) compliance. Lead your team 2,000 miles through the treacherous path to security compliance while managing morale, answering cybersecurity questions, and avoiding compliance disasters.
 
 ## About
 
-Instead of traversing the Oregon Trail in a covered wagon, you're leading a cybersecurity team through the challenges of achieving compliance certification. Answer real CIS framework questions, manage your team's morale and SPRS (Supplier Performance Risk System) score, and navigate random events that can make or break your journey.
+Instead of traversing the Oregon Trail in a covered wagon, you're leading a cybersecurity team through the challenges of achieving compliance certification. Answer real CIS framework questions, manage your team's morale, and navigate random events that can make or break your journey.
 
 ## Features
 
 ### Core Gameplay
 - **2,000 Mile Journey**: Progress toward full compliance certification
 - **Team Management**: Select and manage your compliance team members
-- **Resource Management**: Balance morale and SPRS score throughout your journey
-- **50+ Real Questions**: Authentic CIS Controls and CMMC framework questions
+- **Resource Management**: Manage your team's morale throughout your journey
+- **50+ Real Questions**: Authentic CIS Controls framework questions
 - **Multiple Difficulty Levels**:
   - **IG1 Starter**: +50% morale, -50% death chance (Easy)
   - **IG2 Professional**: Standard difficulty (Normal)
@@ -21,7 +21,7 @@ Instead of traversing the Oregon Trail in a covered wagon, you're leading a cybe
 
 ### Game Elements
 - **Trail Decisions**: Continue traveling, rest to restore morale, or collect evidence
-- **Evidence Collection**: Mini-game to gather CMMC compliance evidence
+- **Evidence Collection**: Mini-game to gather compliance evidence
 - **River Crossings**: Classic Oregon Trail-style challenges adapted for compliance
 - **Valley of Despair**: Convince leadership to continue funding your compliance journey
 - **Supply Stores**: Purchase helpful items like pizza, training, consultants, and more
@@ -169,7 +169,7 @@ The game includes:
 - **50+ CIS Controls questions** covering safeguards like asset management, access control, data protection, and incident response
 - **Random events** including good (compliance wins) and bad (security incidents, audits)
 - **Death scenarios** for team members (burnout, security incidents, compliance failures)
-- **Supply store items** with various effects on morale and SPRS score
+- **Supply store items** with various effects on morale
 
 ## Contributing
 
@@ -188,7 +188,6 @@ This project is intended for educational and entertainment purposes to help team
 
 - Inspired by the classic Oregon Trail game
 - Built on the CIS Controls Framework
-- CMMC compliance requirements
 
 ---
 
