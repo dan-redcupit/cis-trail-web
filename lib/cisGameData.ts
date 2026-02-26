@@ -896,5 +896,5 @@ export const DEFAULT_PARTY = [
   "Security Admin",
   "Compliance Officer",
   "Help Desk Hero",
-  "The Intern (unnamed)"
+  "The Intern (Wears a red shirt)"
 ];
