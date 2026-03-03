@@ -1,6 +1,6 @@
 'use client';
 
-import { ShuffledQuestion } from '@/lib/gameData';
+import { ShuffledQuestion } from '@/lib/cisGameData';
 
 interface QuestionScreenProps {
   question: ShuffledQuestion;

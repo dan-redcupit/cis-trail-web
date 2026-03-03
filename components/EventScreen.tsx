@@ -1,6 +1,6 @@
 'use client';
 
-import { GameEvent } from '@/lib/gameData';
+import { GameEvent } from '@/lib/cisGameData';
 
 interface EventScreenProps {
   event: GameEvent;

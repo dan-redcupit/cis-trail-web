@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DEFAULT_PARTY } from '@/lib/gameData';
+import { DEFAULT_PARTY } from '@/lib/cisGameData';
 import * as sounds from '@/lib/sounds';
 
 interface PartySelectProps {
