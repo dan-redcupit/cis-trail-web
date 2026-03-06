@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { authenticatedPost } from '@/lib/clientSession';
 
 interface NameEntryModalProps {
   score: number;
@@ -9,6 +10,12 @@ interface NameEntryModalProps {
   won: boolean;
   onSubmit: (name: string) => void;
   onSkip: () => void;
+}
+
+interface ScoreResponse {
+  success: boolean;
+  rank: number;
+  session_token?: string;
 }
 
 export default function NameEntryModal({
@@ -23,35 +30,33 @@ export default function NameEntryModal({
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [rank, setRank] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     if (!name.trim()) return;
 
     setSubmitting(true);
+    setError(null);
 
-    try {
-      const response = await fetch('/api/scores', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          playerName: name.trim(),
-          score,
-          accuracy,
-          survivors,
-          won
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setRank(data.rank);
-        setSubmitted(true);
+    const result = await authenticatedPost<ScoreResponse>({
+      url: '/api/scores',
+      body: {
+        playerName: name.trim(),
+        score,
+        accuracy,
+        survivors,
+        won
       }
-    } catch (error) {
-      console.error('Failed to submit score:', error);
-    } finally {
-      setSubmitting(false);
+    });
+
+    if (result.ok && result.data) {
+      setRank(result.data.rank);
+      setSubmitted(true);
+    } else {
+      setError(result.error || 'Failed to submit score');
     }
+
+    setSubmitting(false);
   };
 
   if (submitted) {
@@ -91,6 +96,12 @@ export default function NameEntryModal({
           <div>Accuracy: {accuracy}%</div>
           <div>Status: {won ? 'Certified!' : 'Failed'}</div>
         </div>
+
+        {error && (
+          <div className="text-terminal-red text-center mb-4 text-sm border border-terminal-red p-2">
+            {error}
+          </div>
+        )}
 
         <div className="mb-4">
           <label className="text-terminal-green block mb-2">

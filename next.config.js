@@ -1,9 +1,12 @@
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+
+initOpenNextCloudflareForDev();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Removed 'output: export' to enable API routes for leaderboard
   images: {
     unoptimized: true,
   },
-}
+};
 
-module.exports = nextConfig
+export default nextConfig;

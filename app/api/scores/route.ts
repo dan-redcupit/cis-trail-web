@@ -1,5 +1,6 @@
-import { kv } from '@vercel/kv';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { NextResponse } from 'next/server';
+import { validateSession, rotateToken, getDadJoke } from '@/lib/session';
 
 export interface LeaderboardEntry {
   id: string;
@@ -11,7 +12,7 @@ export interface LeaderboardEntry {
   won: boolean;
 }
 
-const LEADERBOARD_KEY = 'cmmc-trail-leaderboard';
+const LEADERBOARD_KEY = 'cis-trail-leaderboard';
 const MAX_ENTRIES = 100;
 
 // In-memory fallback for development
@@ -19,9 +20,10 @@ let inMemoryLeaderboard: LeaderboardEntry[] = [];
 
 async function getLeaderboard(): Promise<LeaderboardEntry[]> {
   try {
-    const data = await kv.get<LeaderboardEntry[]>(LEADERBOARD_KEY);
+    const { env } = await getCloudflareContext();
+    const data = await env.LEADERBOARD.get<LeaderboardEntry[]>(LEADERBOARD_KEY, 'json');
     return data || [];
-  } catch (error) {
+  } catch {
     // Fallback to in-memory for local dev without KV
     console.log('Using in-memory leaderboard (KV not configured)');
     return inMemoryLeaderboard;
@@ -30,14 +32,15 @@ async function getLeaderboard(): Promise<LeaderboardEntry[]> {
 
 async function saveLeaderboard(entries: LeaderboardEntry[]): Promise<void> {
   try {
-    await kv.set(LEADERBOARD_KEY, entries);
-  } catch (error) {
+    const { env } = await getCloudflareContext();
+    await env.LEADERBOARD.put(LEADERBOARD_KEY, JSON.stringify(entries));
+  } catch {
     // Fallback to in-memory
     inMemoryLeaderboard = entries;
   }
 }
 
-// GET - Fetch leaderboard
+// GET - Fetch leaderboard (no auth required)
 export async function GET() {
   try {
     const leaderboard = await getLeaderboard();
@@ -55,11 +58,18 @@ export async function GET() {
   }
 }
 
-// POST - Submit a new score
+// POST - Submit a new score (requires valid session)
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    // Validate session
+    const { valid, sessionId } = await validateSession(request);
+    if (!valid || !sessionId) {
+      const joke = await getDadJoke();
+      return NextResponse.json({ error: joke }, { status: 422 });
+    }
 
+    // Re-parse body since validateSession consumed it
+    const body = await request.json();
     const { playerName, score, accuracy, survivors, won } = body;
 
     // Validate input
@@ -97,13 +107,17 @@ export async function POST(request: Request) {
 
     await saveLeaderboard(sorted);
 
+    // Rotate token for next request
+    const newToken = await rotateToken(sessionId);
+
     // Find rank of new entry
     const rank = sorted.findIndex(e => e.id === newEntry.id) + 1;
 
     return NextResponse.json({
       success: true,
       rank,
-      entry: newEntry
+      entry: newEntry,
+      session_token: newToken,
     });
   } catch (error) {
     console.error('Error submitting score:', error);
