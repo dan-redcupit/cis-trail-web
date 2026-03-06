@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { GameState } from '@/lib/gameState';
-import { playBrrrt } from '@/lib/sounds';
+import { playBrrrt, toggleThemeMusic, isMusicCurrentlyPlaying } from '@/lib/sounds';
 import MattLeeCharacter, {
   MATT_TRAIL_STANDING,
   MATT_TRAIL_WALKING_1,
@@ -28,6 +28,14 @@ const MATT_FRAMES = [
   MATT_TRAIL_WALKING_1,
   MATT_TRAIL_WALKING_2,
 ];
+
+// Mini Matt Lee projectile for the missile - flying with arms forward like Superman
+const MATT_MISSILE = `
+ ██████
+█● ● ░█═══>>
+█▓▓▓▓▓█
+ ██████
+`;
 
 // M1 Abrams Tank ASCII art frames (kept for firing feature)
 const TANK_FRAMES = [
@@ -73,6 +81,19 @@ export default function TrailScreen({ state, onContinue, onRest, onHunt, onSuppl
   const [frame, setFrame] = useState(0);
   const [trackOffset, setTrackOffset] = useState(0);
   const [showFiring, setShowFiring] = useState(false);
+  const [missilePosition, setMissilePosition] = useState<number | null>(null);
+  const [showExplosion, setShowExplosion] = useState(false);
+  const [musicOn, setMusicOn] = useState(true);
+
+  // Sync music state with actual playing state
+  useEffect(() => {
+    setMusicOn(isMusicCurrentlyPlaying());
+  }, []);
+
+  const handleMusicToggle = () => {
+    const isPlaying = toggleThemeMusic();
+    setMusicOn(isPlaying);
+  };
 
   const progressPct = (state.milesTraveled / state.totalMiles) * 100;
   const milesRemaining = state.totalMiles - state.milesTraveled;
@@ -90,9 +111,31 @@ export default function TrailScreen({ state, onContinue, onRest, onHunt, onSuppl
     return () => clearInterval(interval);
   }, []);
 
+  // Missile animation loop
+  useEffect(() => {
+    if (missilePosition === null) return;
+
+    const interval = setInterval(() => {
+      setMissilePosition(pos => {
+        if (pos === null) return null;
+        const newPos = pos + 8; // Move 8% per frame
+        if (newPos >= 100) {
+          // Missile reached the end - show explosion
+          setShowExplosion(true);
+          setTimeout(() => setShowExplosion(false), 400);
+          return null;
+        }
+        return newPos;
+      });
+    }, 30); // Fast animation
+
+    return () => clearInterval(interval);
+  }, [missilePosition]);
+
   // Handle main gun firing
   const handleFire = () => {
     setShowFiring(true);
+    setMissilePosition(20); // Start from tank barrel position
     playBrrrt();
     onFireTank?.(); // Track for achievement
 
@@ -104,8 +147,16 @@ export default function TrailScreen({ state, onContinue, onRest, onHunt, onSuppl
   return (
     <div className="max-w-2xl mx-auto">
       {/* Header */}
-      <div className="text-terminal-green text-center text-xl sm:text-2xl font-bold border-2 border-terminal-green p-2 mb-2">
+      <div className="text-terminal-green text-center text-xl sm:text-2xl font-bold border-2 border-terminal-green p-2 mb-2 relative">
         THE CIS TRAIL
+        {/* Music Toggle */}
+        <button
+          onClick={handleMusicToggle}
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-sm px-2 py-1 border border-terminal-green hover:bg-terminal-green hover:text-black transition-colors"
+          title={musicOn ? 'Mute Music' : 'Play Music'}
+        >
+          {musicOn ? '🎵' : '🔇'}
+        </button>
       </div>
 
       {/* Animated Scene */}
@@ -133,6 +184,51 @@ export default function TrailScreen({ state, onContinue, onRest, onHunt, onSuppl
 {showFiring ? TANK_FRAMES[frame === 0 ? 1 : 2] : TANK_FRAMES[0]}
           </pre>
         </div>
+
+        {/* Matt Lee Missile Projectile */}
+        {missilePosition !== null && (
+          <div
+            className="absolute z-10 transition-none"
+            style={{
+              top: '40px',
+              left: `${missilePosition}%`,
+              transform: 'translateX(-50%)',
+            }}
+          >
+            <pre
+              className="text-[10px] leading-tight font-mono"
+              style={{
+                color: MATT_BLUE,
+                textShadow: '0 0 8px #2ea3f2, 0 0 16px #2ea3f2',
+                animation: 'pulse 0.1s infinite alternate'
+              }}
+            >
+{MATT_MISSILE}
+            </pre>
+            {/* Flame trail */}
+            <div
+              className="absolute text-terminal-yellow text-xs font-bold"
+              style={{
+                top: '12px',
+                left: '-30px',
+                animation: 'pulse 0.05s infinite alternate'
+              }}
+            >
+              {'~*'.repeat(3)}
+            </div>
+          </div>
+        )}
+
+        {/* Explosion effect at the end */}
+        {showExplosion && (
+          <div
+            className="absolute z-20 text-terminal-yellow font-bold animate-ping"
+            style={{ top: '20px', right: '10px' }}
+          >
+            <div className="text-3xl">BOOM!</div>
+            <div className="text-xl">💥🔥💥</div>
+          </div>
+        )}
 
         {/* Scrolling ground */}
         <div className="absolute bottom-0 left-0 w-full">

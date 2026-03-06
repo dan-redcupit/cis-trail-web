@@ -474,3 +474,255 @@ export function playSecretFound() {
     { freq: 784, dur: 0.2 },   // G (high)
   ], 'sine');
 }
+
+// === THEME MUSIC ===
+
+// Store references for the music system
+let musicOscillators: OscillatorNode[] = [];
+let musicGainNodes: GainNode[] = [];
+let musicInterval: ReturnType<typeof setInterval> | null = null;
+let isMusicPlaying = false;
+
+// CIS Trail Theme - 8-bit adventure march
+// Key of C major, upbeat and adventurous
+const THEME_MELODY = [
+  // Intro phrase (building anticipation)
+  { note: 'C4', dur: 0.2 },
+  { note: 'E4', dur: 0.2 },
+  { note: 'G4', dur: 0.2 },
+  { note: 'C5', dur: 0.4 },
+  { note: 'B4', dur: 0.2 },
+  { note: 'A4', dur: 0.2 },
+  { note: 'G4', dur: 0.4 },
+  { note: 'rest', dur: 0.2 },
+
+  // Main theme A (heroic march)
+  { note: 'C5', dur: 0.3 },
+  { note: 'C5', dur: 0.1 },
+  { note: 'D5', dur: 0.2 },
+  { note: 'E5', dur: 0.4 },
+  { note: 'D5', dur: 0.2 },
+  { note: 'C5', dur: 0.2 },
+  { note: 'A4', dur: 0.4 },
+  { note: 'G4', dur: 0.4 },
+
+  // Main theme B (determined forward motion)
+  { note: 'A4', dur: 0.2 },
+  { note: 'B4', dur: 0.2 },
+  { note: 'C5', dur: 0.3 },
+  { note: 'C5', dur: 0.1 },
+  { note: 'D5', dur: 0.2 },
+  { note: 'E5', dur: 0.2 },
+  { note: 'F5', dur: 0.2 },
+  { note: 'E5', dur: 0.4 },
+  { note: 'rest', dur: 0.2 },
+
+  // Bridge (tension building)
+  { note: 'G5', dur: 0.3 },
+  { note: 'F5', dur: 0.1 },
+  { note: 'E5', dur: 0.2 },
+  { note: 'D5', dur: 0.2 },
+  { note: 'C5', dur: 0.4 },
+  { note: 'B4', dur: 0.2 },
+  { note: 'C5', dur: 0.6 },
+
+  // Resolution (triumphant)
+  { note: 'E5', dur: 0.2 },
+  { note: 'G5', dur: 0.2 },
+  { note: 'C6', dur: 0.6 },
+  { note: 'B5', dur: 0.2 },
+  { note: 'A5', dur: 0.2 },
+  { note: 'G5', dur: 0.4 },
+  { note: 'rest', dur: 0.4 },
+];
+
+// Bass line (accompaniment)
+const THEME_BASS = [
+  { note: 'C3', dur: 0.4 },
+  { note: 'C3', dur: 0.4 },
+  { note: 'G2', dur: 0.4 },
+  { note: 'G2', dur: 0.4 },
+  { note: 'A2', dur: 0.4 },
+  { note: 'A2', dur: 0.4 },
+  { note: 'G2', dur: 0.8 },
+
+  { note: 'C3', dur: 0.4 },
+  { note: 'E3', dur: 0.4 },
+  { note: 'G3', dur: 0.4 },
+  { note: 'G3', dur: 0.4 },
+  { note: 'F3', dur: 0.4 },
+  { note: 'F3', dur: 0.4 },
+  { note: 'E3', dur: 0.4 },
+  { note: 'E3', dur: 0.4 },
+
+  { note: 'F3', dur: 0.4 },
+  { note: 'F3', dur: 0.4 },
+  { note: 'G3', dur: 0.4 },
+  { note: 'G3', dur: 0.4 },
+  { note: 'A3', dur: 0.4 },
+  { note: 'A3', dur: 0.4 },
+  { note: 'G3', dur: 0.8 },
+
+  { note: 'E3', dur: 0.4 },
+  { note: 'D3', dur: 0.4 },
+  { note: 'C3', dur: 0.4 },
+  { note: 'G2', dur: 0.4 },
+  { note: 'C3', dur: 0.8 },
+
+  { note: 'C3', dur: 0.4 },
+  { note: 'E3', dur: 0.4 },
+  { note: 'G3', dur: 0.4 },
+  { note: 'G3', dur: 0.4 },
+  { note: 'C3', dur: 0.8 },
+];
+
+// Convert note name to frequency
+function noteToFreq(note: string): number {
+  if (note === 'rest') return 0;
+
+  const noteMap: Record<string, number> = {
+    'C2': 65.41, 'D2': 73.42, 'E2': 82.41, 'F2': 87.31, 'G2': 98.00, 'A2': 110.00, 'B2': 123.47,
+    'C3': 130.81, 'D3': 146.83, 'E3': 164.81, 'F3': 174.61, 'G3': 196.00, 'A3': 220.00, 'B3': 246.94,
+    'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'B4': 493.88,
+    'C5': 523.25, 'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99, 'A5': 880.00, 'B5': 987.77,
+    'C6': 1046.50, 'D6': 1174.66, 'E6': 1318.51, 'F6': 1396.91, 'G6': 1567.98, 'A6': 1760.00, 'B6': 1975.53,
+  };
+
+  return noteMap[note] || 440;
+}
+
+// Play a single note with given parameters
+function playMusicNote(freq: number, duration: number, type: OscillatorType, volume: number, startTime: number): { osc: OscillatorNode; gain: GainNode } | null {
+  if (freq === 0) return null; // rest
+
+  try {
+    const ctx = getAudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.type = type;
+    osc.frequency.value = freq;
+
+    // Envelope for cleaner sound
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(volume, startTime + 0.02);
+    gain.gain.setValueAtTime(volume, startTime + duration - 0.05);
+    gain.gain.linearRampToValueAtTime(0, startTime + duration);
+
+    osc.start(startTime);
+    osc.stop(startTime + duration + 0.1);
+
+    return { osc, gain };
+  } catch (e) {
+    return null;
+  }
+}
+
+// Schedule a melody line
+function scheduleMelody(melody: { note: string; dur: number }[], type: OscillatorType, volume: number, startTime: number): number {
+  let currentTime = startTime;
+
+  for (const { note, dur } of melody) {
+    const freq = noteToFreq(note);
+    const result = playMusicNote(freq, dur, type, volume, currentTime);
+    if (result) {
+      musicOscillators.push(result.osc);
+      musicGainNodes.push(result.gain);
+    }
+    currentTime += dur;
+  }
+
+  return currentTime - startTime; // Return total duration
+}
+
+// Start playing the theme music (loops)
+export function startThemeMusic() {
+  if (isMusicPlaying) return;
+
+  try {
+    const ctx = getAudioContext();
+    isMusicPlaying = true;
+
+    const playLoop = () => {
+      if (!isMusicPlaying) return;
+
+      const startTime = ctx.currentTime + 0.1;
+
+      // Play melody (square wave for that 8-bit feel)
+      const duration = scheduleMelody(THEME_MELODY, 'square', 0.12, startTime);
+
+      // Play bass line (triangle wave for warmth)
+      scheduleMelody(THEME_BASS, 'triangle', 0.08, startTime);
+
+      // Add a simple drum beat
+      const beatInterval = 0.4; // quarter note
+      const totalBeats = Math.floor(duration / beatInterval);
+      for (let i = 0; i < totalBeats; i++) {
+        const beatTime = startTime + (i * beatInterval);
+        // Kick on 1 and 3
+        if (i % 2 === 0) {
+          playMusicNote(60, 0.1, 'triangle', 0.15, beatTime);
+        }
+        // Hi-hat on every beat
+        playMusicNote(1200, 0.05, 'square', 0.03, beatTime);
+      }
+
+      // Schedule next loop
+      musicInterval = setTimeout(playLoop, duration * 1000);
+    };
+
+    playLoop();
+  } catch (e) {
+    isMusicPlaying = false;
+  }
+}
+
+// Stop the theme music
+export function stopThemeMusic() {
+  isMusicPlaying = false;
+
+  if (musicInterval) {
+    clearTimeout(musicInterval);
+    musicInterval = null;
+  }
+
+  // Stop all oscillators
+  musicOscillators.forEach(osc => {
+    try {
+      osc.stop();
+    } catch (e) {
+      // Already stopped
+    }
+  });
+
+  // Disconnect gain nodes
+  musicGainNodes.forEach(gain => {
+    try {
+      gain.disconnect();
+    } catch (e) {
+      // Already disconnected
+    }
+  });
+
+  musicOscillators = [];
+  musicGainNodes = [];
+}
+
+// Toggle theme music
+export function toggleThemeMusic(): boolean {
+  if (isMusicPlaying) {
+    stopThemeMusic();
+    return false;
+  } else {
+    startThemeMusic();
+    return true;
+  }
+}
+
+// Check if music is playing
+export function isMusicCurrentlyPlaying(): boolean {
+  return isMusicPlaying;
+}

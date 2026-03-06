@@ -28,6 +28,28 @@ import { unlockAchievement } from '@/lib/achievements';
 export default function Home() {
   const [state, dispatch] = useReducer(gameReducer, getInitialState());
   const [showNameEntry, setShowNameEntry] = useState(false);
+  const [musicPlaying, setMusicPlaying] = useState(false);
+
+  // Theme music - play during active gameplay screens
+  useEffect(() => {
+    const activeScreens = ['trail', 'question', 'result', 'event', 'death', 'supplies', 'resting', 'hunting', 'river', 'valley_of_despair', 'store'];
+    const shouldPlayMusic = activeScreens.includes(state.screen);
+
+    if (shouldPlayMusic && !musicPlaying) {
+      sounds.startThemeMusic();
+      setMusicPlaying(true);
+    } else if (!shouldPlayMusic && musicPlaying) {
+      sounds.stopThemeMusic();
+      setMusicPlaying(false);
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (musicPlaying) {
+        sounds.stopThemeMusic();
+      }
+    };
+  }, [state.screen, musicPlaying]);
 
   const handleTitleContinue = useCallback(() => {
     sounds.playStart();
